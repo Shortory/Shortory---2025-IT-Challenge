@@ -10,26 +10,23 @@
 <h3 align="center">시청자의 감정과 댓글의 타임스탬프를 분석해 영상 속 하이라이트를 자동으로 추출하는 숏폼 제작 웹 서비스</strong></h3>
 
 
-<img width="2342" height="984" alt="image" src="https://github.com/user-attachments/assets/49a27316-465b-4965-99a5-8e94c364af34" />
-
+<img width="2580" height="1300" alt="image" src="https://github.com/user-attachments/assets/49a27316-465b-4965-99a5-8e94c364af34" />
 <img width="2580" height="1408" alt="image" src="https://github.com/user-attachments/assets/afcdcc89-a8d9-48a1-94fd-15545568495f" />
-
 <img width="2580" height="1384" alt="image" src="https://github.com/user-attachments/assets/f27aabe9-a052-4d37-81d8-83df1c3d7324" />
-
 <img width="2580" height="1306" alt="image" src="https://github.com/user-attachments/assets/7b484919-8061-4515-943e-857a0e74dee5" />
 
  
 
-<br />
+<br/>
 
 ## 프로젝트 개요
-**숏토리(shortory)** 는 유튜브 댓글의 타임스탬프와 시청자의 표정을 분석하여, 숏폼(Short-form) 하이라이트 영상을 자동 생성하는 웹 서비스입니다.  
-웹캠을 사용하여 사용자의 감정인식과 시선추적 기반 집중도를 분석하고, 분석 결과를 바탕으로 감정이 두드러지게 나타나는 장면을 자동으로 선정하여 숏폼 영상을 생성합니다. 
-또한 유튜브 영상 속 타임스탬프를 수집하여 가장 많이 언급된 구간을 기준으로 하이라이트 영상을 자동 생성합니다.
+**숏토리(Shortory)** 는 서로 독립적으로 동작하는 두 가지 방식으로 숏폼 하이라이트 영상을 자동 생성하는 웹 서비스입니다.
+- 반응 기반 모드: 웹캠으로 수집한 시청자의 표정·시선 데이터를 분석해 집중도/감정 반응이 두드러진 구간을 자동 선정하여 클립을 생성합니다.
+- 댓글 타임스탬프 기반 모드: 유튜브 댓글에 포함된 타임스탬프를 수집·집계해 언급 빈도가 높은 구간을 하이라이트로 추출합니다.
 
 <br />
 
-## 핵심 아이디어
+## ⚡️ 핵심 아이디어
 
 > 댓글과 표정, 모두가 말해주는 진짜 하이라이트!
 > 
