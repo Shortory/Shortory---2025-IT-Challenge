@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>크리에이터 대시보드</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      /* 민트 메인 팔레트 */
+      --primary: #00C8B1;
+      --primary-600: #00b39e;
+      --primary-700: #009e8b;
+
+      --muted: #64748b;
+      --danger: #ef4444;
+      --ok: #10b981;
+      --border: #e5e7eb;
+      --bg: #fafafa;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 28px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      color: #0f172a; background: #fff;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+
+    /* 상단 바 & 버튼 */
+    .bar {
+  display: flex;
+  gap: 8px;               /* 간격 살짝 줄임 */
+  margin: 8px 0 24px;
+  flex-wrap: wrap;         /* 화면 줄어들면 줄바꿈 */
+}
+    .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;       /* 기존 10px 14px → 조금 줄임 */
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: #111827;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 120ms ease-in-out;
+  flex-shrink: 0;          /* 너무 작게 줄어들지 않게 */
+}
+@media (max-width: 480px) {
+  .btn {
+    font-size: 13px;
+    padding: 6px 10px;     /* 더 컴팩트 */
+  }
+}.btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+    .btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn.primary:hover { background: var(--primary-600); border-color: var(--primary-600); }
+    .btn.ghost { background: #fff; border-color: var(--border); }
+    .btn.ghost:hover { border-color: #d1d5db; }
+
+    /* 섹션 타이틀 */
+    .section-title { font-size: 22px; margin: 24px 0 12px; }
+
+    /* 테이블 */
+    .table { width: 100%; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    th { text-align: left; font-weight: 600; color: #111827; background: var(--bg); }
+    tr:hover td { background: #f7fffd; } /* 은은한 민트 느낌 */
+
+    .pill {
+      display: inline-block; padding: 6px 10px; border-radius: 999px;
+      font-size: 12px; border: 1px solid var(--border); color: #111827; background: #fff;
+    }
+    .pill.ok { color: var(--ok); border-color: #bbf7d0; background: #f0fdf4; }
+    .right { text-align: right; }
+  </style>
+</head>
+<body>
+
+  <h1>내가 등록한 리뷰어 모집글</h1>
+  <div class="meta">모집글 관리 · 생성 · 상태 확인</div>
+
+  <div class="bar">
+    <a class="btn primary" href="{{ url_for('creator.create_post') }}">＋ 리뷰어 모집글 등록</a>
+    <a class="btn ghost" href="{{ url_for('auth.logout') }}">로그아웃</a>
+  </div>
+
+  <h2 class="section-title">모집글 목록</h2>
+
+  {% if posts %}
+  <div class="table">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:46%">제목</th>
+          <th style="width:20%">작성일</th>
+          <th style="width:16%">모집 상태</th>
+          <th class="right" style="width:18%">액션</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in posts %}
+        <tr>
+          <td>
+            <a href="{{ url_for('creator.view_post', post_id=post.id) }}" style="text-decoration:none; color:#111827; font-weight:600;">
+              {{ post.title }}
+            </a>
+          </td>
+          <td>{{ post.created_at }}</td>
+          <td>
+            {% if post.is_recruiting %}
+              <span class="pill ok">모집 중</span>
+            {% else %}
+              <span class="pill">모집 완료</span>
+            {% endif %}
+          </td>
+          <td class="right">
+            <a class="btn" href="{{ url_for('creator.view_post', post_id=post.id) }}">상세 보기</a>
+            <a class="btn" href="{{ url_for('creator.edit_post', post_id=post.id) }}">수정</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p style="color:var(--muted)">
+      등록된 글이 없습니다.
+      <a href="{{ url_for('creator.create_post') }}" style="color:var(--primary); text-decoration:none;">지금 등록하기</a>
+    </p>
+  {% endif %}
+
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shortory - 시청자 반응 기반 숏폼 생성기</title>
+
+  <style>
+    :root{
+      /* Base */
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --r:18px; --shadow:0 20px 60px rgba(15,23,42,.12);
+
+      /* Palette (민트 메인) */
+      --mint-50:#F4F2EF;     /* near-white */
+      --mint-300:#DAFEA4;    /* main */
+      --mint-400:#BFF08A;    /* hover 보조 */
+      --sky-300:#94B6EF;     /* 보조 */
+      --sky-200:#BDE6FF;
+
+      /* Brand accent */
+      --accent:var(--mint-300);
+      --accent-600:var(--mint-400);
+
+      /* Gradients */
+      /* 히어로 배경: 민트/스카이 소프트 블러 */
+      --grad-hero:
+        radial-gradient(1200px 600px at 20% -10%, rgba(218,254,164,.55), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(148,182,239,.45), transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, #f9fafb 30%, #f6f7f9 100%);
+
+      /* 버튼: 2색 그라디언트(민트 → 라이트 스카이) */
+      --grad-btn: linear-gradient(135deg, var(--mint-300) 0%, var(--sky-200) 100%);
+      --grad-btn-hover: linear-gradient(135deg, var(--mint-400) 0%, var(--sky-300) 100%);
+      --grad-stroke: linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,.2));
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      color:var(--ink); background:var(--bg); letter-spacing:-0.01em;
+      min-height:100vh; display:flex; flex-direction:column;
+    }
+
+    /* Header */
+    header#siteHeader{
+      position:sticky; top:0; z-index:40;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 56px;
+      background:rgba(255,255,255,.8);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+      transition:box-shadow .25s ease, background .25s ease;
+    }
+    header#siteHeader.is-scrolled{ box-shadow:var(--shadow); background:rgba(255,255,255,.9) }
+    .brand{ font-weight:1000; font-size:clamp(24px,3.6vw,36px); color:#2a3a2f; letter-spacing:-.02em; text-decoration:none }
+
+    /* Hero */
+    .hero{
+      position:relative; min-height:68vh;
+      display:flex; align-items:center; justify-content:center;
+      padding:96px 20px; overflow:hidden; isolation:isolate;
+      background:var(--grad-hero);
+    }
+    .hero::before{
+      /* 민트 비네트 */
+      content:""; position:absolute; inset:-20%;
+      background:radial-gradient(900px 600px at 10% 110%, rgba(218,254,164,.10), transparent 60%);
+      z-index:0;
+    }
+    .hero-content{ position:relative; z-index:1; max-width:940px; text-align:center }
+
+    .badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 14px; border-radius:999px;
+      background:linear-gradient(180deg,#ffffff,#f8fafc); border:1px solid var(--border);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+      font-weight:400; color:#334155; font-size:.9rem; margin-bottom:16px;
+    }
+    .hero-title{
+      font-weight:800;
+      font-size:clamp(28px,4.2vw,46px);
+      line-height:1.12; margin-bottom:18px;
+      letter-spacing:-.02em;
+    }
+
+    .hero-title .highlight{
+      background:linear-gradient(90deg, #6fd86a, var(--mint-300));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+
+   .hero-desc {
+  font-size: clamp(15px, 1.4vw, 18px);
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 28px;
+  font-weight: 200;
+}
+
+    /* Buttons */
+    .btn-row{ display:flex; justify-content:center; gap:14px; flex-wrap:wrap; margin:34px 0 8px }
+    .cta-btn{
+      --h:92px;
+      position:relative; min-width:180px; height:var(--h);
+      padding:18px 22px; border-radius:22px; font-weight:900; text-decoration:none;
+      display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+      background:var(--grad-btn); color:#0b1220; box-shadow:0 8px 30px rgba(75,132,255,.18);
+      border:1px solid rgba(255,255,255,.6); transform:translateZ(0);
+      transition:transform .12s ease, box-shadow .2s ease, background .2s ease;
+    }
+    .cta-btn::after{
+      content:""; position:absolute; inset:0; border-radius:22px; padding:1px;
+      background:var(--grad-stroke);
+      -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude; opacity:.85;
+      pointer-events:none;
+    }
+    .cta-btn:hover{ transform:translateY(-1px); background:var(--grad-btn-hover) }
+    .cta-btn:active{ transform:translateY(0) scale(.99) }
+    .cta-btn .main-label{ font-size:1.14rem }
+    .cta-btn .sub-label{ font-size:.95rem; opacity:.85 }
+
+    /* compact 변형 (하단용) */
+    .cta-btn.compact{ --h:64px; min-width:200px; flex-direction:row; gap:8px; padding:0 18px }
+    .cta-btn.compact .sub-label{ display:none }
+
+    /* Sections */
+    .section{max-width:1120px;margin:0 auto;padding:64px 16px;text-align:center}
+    .sec-head{margin-bottom:20px}
+    .sec-title{font-size:clamp(22px,2.4vw,30px);font-weight:1000;color:#111827;margin-bottom:8px}
+    .sec-desc{color:#6b7280;max-width:780px;margin:10px auto 0}
+
+    /* Grid cards (글래스) */
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(3,1fr)}
+    @media (max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.grid{grid-template-columns:1fr}}
+    .card{
+      position:relative; text-align:left; padding:18px; border-radius:22px;
+      background:rgba(255,255,255,.75);
+      border:1px solid rgba(255,255,255,.6); backdrop-filter:blur(8px);
+      box-shadow:var(--shadow);
+    }
+    .card h3{font-size:1.05rem;margin-bottom:6px}
+    .card p{color:#6b7280;line-height:1.6}
+
+    /* Split panels */
+    .split{display:grid;gap:16px;grid-template-columns:1.1fr .9fr}
+    @media (max-width:980px){.split{grid-template-columns:1fr}}
+    .panel{
+      background:rgba(255,255,255,.78); border:1px solid rgba(255,255,255,.7);
+      border-radius:22px; padding:18px; text-align:left; backdrop-filter:blur(6px); box-shadow:var(--shadow);
+    }
+    .panel h3{font-size:1.15rem;margin-bottom:8px}
+    .list{display:grid;gap:10px;margin-top:6px}
+    .item{display:flex;gap:10px}
+    .item .dot{
+      width:22px;height:22px;border-radius:50%;background:var(--accent);color:#0b1220;
+      display:flex;align-items:center;justify-content:center;font-size:.86rem;font-weight:900;flex:0 0 auto
+    }
+    .item p{margin-top:1px;color:#475569}
+
+    /* Steps */
+    .steps{display:grid;gap:16px;grid-template-columns:repeat(4,1fr)}
+    @media (max-width:980px){.steps{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.steps{grid-template-columns:1fr}}
+    .step{border:1px solid var(--border);border-radius:22px;padding:16px;background:#fff;text-align:left;box-shadow:var(--shadow)}
+    .step .n{font-weight:900;color:#2a3a2f;margin-bottom:6px}
+    .step h4{margin-bottom:6px}
+    .step p{color:#6b7280}
+
+    /* Bottom CTA (동일 버튼 스타일 사용) */
+    .cta-wrap{text-align:center;padding:70px 16px}
+    .cta-wrap .big{font-size:clamp(22px,2.6vw,28px);font-weight:1000;margin-bottom:14px}
+    .cta-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+
+    footer{ text-align:center; padding:24px 0; font-size:0.9rem; color:#9aa3ad; border-top:1px solid var(--border) }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header id="siteHeader">
+    <a href="/" class="brand">Shortory</a>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <span class="badge">CREATOR TOOLS · SHORTS</span>
+      <h1 class="hero-title">SNS를 성장시키고 싶은 크리에이터라면?</h1>
+      <p class="hero-desc">시청자의 감정과 댓글의 타임스탬프를 분석해 영상 속 하이라이트를 자동으로 추출하는 숏폼을 제작해보세요!</p>
+
+      <div class="btn-row">
+        <a href="{{ url_for('auth.login') }}?role=creator" class="cta-btn">
+          <div class="main-label">크리에이터</div>
+          <div class="sub-label">시작하기</div>
+        </a>
+        <a href="{{ url_for('auth.login') }}?role=reviewer" class="cta-btn">
+          <div class="main-label">리뷰어</div>
+          <div class="sub-label">시작하기</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. 기존 방식의 한계 -->
+  <section id="features" class="section">
+    <div class="sec-head">
+      <h2 class="sec-title">기존 숏폼 제작 방식의 어려움 <br> </h2>
+      <p class="sec-desc">
+        Youtube Studio는 조회수와 유입 분석만 제공해 실제 시청자의 감정과 반응을 읽기 어렵습니다. <br><br>
+      </p>
+
+
+    </div>
+    <div class="grid">
+      <article class="card"><h3>🧠 고비용 분석 인프라</h3><p>시선 추적·감정 분석 등 영상 기반 시스템은 <br>비용과 유지보수 부담이 큽니다.</p></article>
+      <article class="card"><h3>📉 한정된 공식 지표</h3><p>조회수·유입 분석은 가능하지만 시청자의 <br>구체적인 반응과 감정은 파악하기 어렵습니다.</p></article>
+      <article class="card"><h3>⏱ 끝없는 수작업</h3><p>편집자가 긴 영상을 보며 ‘하이라이트 구간’를 찾아야 하므로 시간 대비 효율이 낮습니다.</p></article>
+    </div>
+  </section>
+
+  <!-- 2. 개발 배경 & 3. 핵심 아이디어 -->
+  <section class="section">
+    <div class="sec-head">
+      <h2 class="sec-title">시청자 댓글 반응 구간 ➡️  숏츠 생성 <br>
+        <span style="color:#2a3a2f">그 데이터를 자동으로 활용합니다</span></h2>
+    </div>
+    <div class="split">
+      <div class="panel">
+        <h3>개발 배경</h3>
+        <div class="list">
+          <div class="item"><div class="dot">1</div><p>유튜브·틱톡 등 숏폼 소비 급증과 크리에이터의 영상 수요 증가</p></div>
+          <div class="item"><div class="dot">2</div><p>댓글에 “10:43 너무 웃기다”처럼 <b>타임스탬프+감정표현</b>이 이미 존재</p></div>
+          <div class="item"><div class="dot">3</div><p>댓글 속 하이라이트 구간을 자동 추출해 숏폼으로 만들 수 있다면?</p></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>핵심 아이디어</h3>
+        <div class="list">
+          <div class="item"><div class="dot">A</div><p>댓글의 타임스탬프 = 시청자 반응 지표 </p></div>
+          <div class="item"><div class="dot">B</div><p>타임스탬프 + 문장 + 감정 신호 분석</p></div>
+          <div class="item"><div class="dot">C</div><p>해당 구간 클립 자동 추출 → SNS용 숏폼 완성</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 프로세스 -->
+  <section id="how" class="section" style="text-align:center;">
+    <div class="sec-head">
+      <div class="badge" style="margin-bottom:10px;">어떻게 작동하나요?</div>
+      <h2 class="sec-title">댓글 기반 자동 숏폼 제작 프로세스</h2>
+    </div>
+
+    <div class="steps" style="
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  flex-wrap: wrap;
+  text-align: center;
+">
+  <div class="step">
+    <div class="n">01</div>
+    <h4>댓글 크롤링</h4>
+    <p>해당 영상 댓글을 수집하고<br> 타임스탬프·감정 키워드를 추출</p>
+  </div>
+  <div class="step">
+    <div class="n">02</div>
+    <h4>히트 구간 선정</h4>
+    <p>언급 수·좋아요 수 등 <br>가중치로 최적 구간 자동 선별</p>
+  </div>
+  <div class="step">
+    <div class="n">03</div>
+    <h4>클립 생성</h4>
+    <p>타임스탬프 기준 ± 5~10초 <br> 범위로 영상 추출</p>
+  </div>
+</div>
+
+  </section>
+
+  <section class="section" style="text-align:center;">
+  <div class="sec-head">
+    <h2 class="sec-title">감정 기반 자동 숏폼 제작 프로세스</h2>
+  </div>
+<div class="steps" style="
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  flex-wrap: wrap;
+  text-align: center;
+">
+  <div class="step">
+    <div class="n">01</div>
+    <h4>감정 분석</h4>
+    <p>영상 내 시청자의 얼굴과 표정을 실시간 분석하여<br> 감정 변화를 감지</p>
+  </div>
+  <div class="step">
+    <div class="n">02</div>
+    <h4>시선 추적</h4>
+    <p>시청자의 시선이 머무는 곳의 집중도를 판별하여<br> 집중도가 높은 구간 선별</p>
+  </div>
+  <div class="step">
+    <div class="n">03</div>
+    <h4>클립 생성</h4>
+    <p>감정과 집중도가 높은 점수를 기준으로 <br> 숏폼 영상 자동 생성</p>
+  </div>
+</div>
+
+
+</section>
+
+
+
+
+
+  <!-- 5. 기대 효과 -->
+  <section class="section">
+    <div class="sec-head">
+      <div class="badge" style="margin-bottom:10px;">기대 효과</div>
+      <h2 class="sec-title">‘시청자의 진짜 반응’이 반영된 숏폼으로 성과를 높이세요</h2>
+    </div>
+    <div class="grid">
+      <article class="card"><h3>🎯 정밀한 하이라이트</h3><p>시청자가 직접 꼽은 장면 중심으로 클립 제작</p></article>
+      <article class="card"><h3>⚡ 시간 절약</h3><p>긴 영상 탐색 없이 자동화 파이프라인으로 빠른 생산</p></article>
+      <article class="card"><h3>📱 SNS 최적화</h3><p>세로 9:16, 자막/오버레이 등 즉시 활용 가능한 결과</p></article>
+    </div>
+  </section>
+
+  <!-- 하단 CTA (동일 디자인) -->
+  <section class="cta-wrap" id="cta">
+    <div class="big">지금, Shortory를 시작해 보세요</div>
+    <div class="cta-actions">
+      <a href="{{ url_for('auth.login') }}?role=creator" class="cta-btn compact">
+        <span class="main-label">크리에이터로 시작하기</span>
+        <span class="sub-label">Start as Creator</span>
+      </a>
+      <a href="{{ url_for('auth.login') }}?role=reviewer" class="cta-btn compact">
+        <span class="main-label">리뷰어로 시작하기</span>
+        <span class="sub-label">Start as Reviewer</span>
+      </a>
+    </div>
+  </section>
+
+  <footer>© 2025 찰나의 Shortory</footer>
+
+  <script>
+    // 스크롤 시 헤더 그림자
+    (function(){
+      const h = document.getElementById('siteHeader');
+      const onScroll = () => h.classList.toggle('is-scrolled', window.scrollY > 4);
+      onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+    })();
+  </script>
+</body>
+</html>

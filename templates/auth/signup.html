@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shortory - 회원가입</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f9f9fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .signup-wrapper {
+      width: 400px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      padding: 40px 30px;
+      text-align: center;
+    }
+    .signup-wrapper h2 {
+      font-size: 24px;
+      color: #00C8B1;
+      margin-bottom: 24px;
+    }
+    #signup-form input {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px;
+      margin-bottom: 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f8f8f8;
+      font-size: 1rem;
+    }
+    #signup-form input::placeholder {
+      color: #bbb;
+    }
+    #signup-form input[type="submit"] {
+      background-color: #00C8B1;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      transition: background-color 0.3s;
+      cursor: pointer;
+    }
+    #signup-form input[type="submit"]:hover {
+      background-color: #00b39e;
+    }
+    .login-link, .back-home {
+      display: block;
+      margin-top: 14px;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .login-link { color: #00C8B1; }
+    .back-home { color: #777; }
+    .login-link:hover, .back-home:hover {
+      text-decoration: underline;
+    }
+    .error-msg {
+      color: red;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+  </style>
+  <script>
+    function validateForm() {
+      const pw1 = document.getElementById('password').value;
+      const pw2 = document.getElementById('confirm_password').value;
+      if (pw1 !== pw2) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return false;
+      }
+      return true;
+    }
+  </script>
+</head>
+<body>
+  <div class="signup-wrapper">
+    <h2>{{ '크리에이터' if role == 'creator' else '리뷰어' }} 회원가입</h2>
+
+    <form id="signup-form" method="post" action="/signup" onsubmit="return validateForm()">
+      <input type="hidden" name="role" value="{{ role }}">
+      {% if msg %}
+        <div class="error-msg">{{ msg }}</div>
+      {% endif %}
+      <input type="text" name="name" placeholder="이름" required>
+      <input type="email" name="email" placeholder="이메일" required>
+      <input type="tel" name="phone" placeholder="전화번호" required>
+      <input type="text" name="username" placeholder="아이디" required>
+      <input type="password" name="password" id="password" placeholder="비밀번호" required>
+      <input type="password" id="confirm_password" name="confirm_password" placeholder="비밀번호 확인" required>
+      <input type="submit" value="회원가입">
+    </form>
+
+    <a href="{{ url_for('auth.login') }}?role={{ role }}" class="login-link">이미 계정이 있으신가요?</a>
+    <a href="/" class="back-home">🏠 홈으로 돌아가기</a>
+  </div>
+</body>
+</html>

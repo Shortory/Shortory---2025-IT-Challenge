@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>감정 분석 중… · Shortory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --r:18px; --shadow:0 20px 60px rgba(15,23,42,.12);
+      --mint-50:#F4F2EF; --mint-300:#DAFEA4; --mint-400:#BFF08A;
+      --sky-300:#94B6EF; --sky-200:#BDE6FF;
+      --accent:var(--mint-300); --accent-600:var(--mint-400);
+      --grad-page:
+        radial-gradient(1200px 600px at 20% -10%, rgba(218,254,164,.45), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(148,182,239,.35), transparent 60%),
+        linear-gradient(180deg,#ffffff 0%,#f8fafc 40%,#f6f7f9 100%);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      color:var(--ink); background:var(--grad-page); min-height:100vh;
+      display:flex; flex-direction:column;
+    }
+
+    /* Header */
+    .site-header{
+      position:sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 24px; background:rgba(255,255,255,.8);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{font-weight:1000; letter-spacing:-.02em; text-decoration:none; color:#2a3a2f; font-size:20px}
+
+    /* Container */
+    .container{max-width:1200px; margin:24px auto; padding:0 14px;}
+
+    /* Hero */
+    .page-hero{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.75); backdrop-filter:blur(8px);
+      border-radius:18px; padding:14px 16px; box-shadow:var(--shadow);
+    }
+    .left{display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap;}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:999px; border:1px solid var(--border);
+      background:linear-gradient(180deg,#fff,#f8fafc);
+      font-size:.9rem; color:#334155; font-weight:700;
+    }
+    .title-wrap{line-height:1.18}
+    .hero-title{font-size:clamp(18px,2.8vw,27px); font-weight:600; letter-spacing:-.02em;}
+    .hero-sub{color:var(--muted); font-size:clamp(15px,1.3vw,15px); font-weight:400; margin-top:12px; margin-bottom:10px;}
+    .status{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:12px; background:#fff; border:1px solid var(--border);
+      font-weight:900; color:#0f172a; font-size:.95rem;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%; background:var(--accent);
+      box-shadow:0 0 0 6px rgba(218,254,164,.35);
+      animation:pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{ box-shadow:0 0 0 6px rgba(218,254,164,.35) }
+      50%    { box-shadow:0 0 0 10px rgba(148,182,239,.35) }
+    }
+
+    /* Analyzer */
+    .analyzer-card{
+      margin-top:16px; border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.86); border-radius:20px; padding:18px;
+      box-shadow:0 18px 60px rgba(15,23,42,.12); backdrop-filter:blur(8px);
+    }
+    /* 가로 2열: 왼쪽(영상) 1.6, 오른쪽(웹캠) 1 */
+    .row{
+      display:grid; gap:16px; grid-template-columns:1.6fr 1fr; align-items:start;
+    }
+    @media (max-width:980px){ .row{grid-template-columns:1fr} }
+
+    .panel{
+      border:1px solid var(--border); border-radius:18px; padding:18px; background:#fff;
+      width:100%; max-width:none; /* 가로 배치용 */
+    }
+    .panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+    .panel-title{
+      font-weight:900; letter-spacing:-.01em;
+      background:linear-gradient(90deg, #6fd86a, var(--mint-300));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:6px; padding:5px 9px; border-radius:999px;
+      border:1px solid var(--border); background:#fff; color:#334155; font-weight:700; font-size:.82rem;
+    }
+
+    /* Video areas */
+    .frame{
+      position:relative; width:100%; border-radius:14px; overflow:hidden; background:#000;
+      box-shadow:0 12px 32px rgba(15,23,42,.2);
+    }
+    .ratio-16x9{ aspect-ratio:16 / 9; min-height:360px; }
+    .ratio-4x3 { aspect-ratio:4 / 3;  min-height:300px; }
+
+    @media (min-width:1100px){
+      .ratio-16x9{ min-height:400px; }
+      .ratio-4x3 { min-height:240px; }
+    }
+
+    #player, #webcam{
+      position:absolute; inset:0; width:100%; height:100%;
+      display:block; background:#000; object-fit:cover;
+    }
+    #webcam{ transform:scaleX(-1); -webkit-transform:scaleX(-1); }
+
+    .helper{margin-top:12px; text-align:center; color:var(--muted); font-size:.95rem; font-weight:500;}
+    .footer{ text-align:center; color:#9aa3ad; font-size:.9rem; margin:22px 0 10px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">Shortory</a>
+    <div style="height:1px"></div>
+  </header>
+
+  <main class="container">
+    <section class="page-hero">
+      <div class="left">
+        <span class="badge">EMOTION GAZE · ANALYZING</span>
+        <div class="title-wrap">
+          <div class="hero-title">감정과 집중도 분석 중... 🔄</div>
+          <p class="hero-sub">영상을 시청하는 리뷰어의 감정과 집중도를 기반으로 숏츠 영상을 생성합니다. </p>
+        </div>
+      </div>
+      <div class="status"><span class="dot"></span> 분석 진행 중</div>
+    </section>
+
+    <!-- post_id 전달용 -->
+    <div id="page-meta" data-post-id="{{ post_id }}"></div>
+
+    <!-- Analyzer: 가로 배치 -->
+    <section class="analyzer-card">
+      <div class="row">
+        <!-- 왼쪽: YouTube -->
+        <article class="panel">
+          <div class="panel-head">
+            <div class="panel-title">YouTube 플레이어</div>
+            <span class="chip">영상 원본</span>
+          </div>
+          <div class="frame ratio-16x9">
+            <div id="player"></div>
+          </div>
+        </article>
+
+        <!-- 오른쪽: 웹캠 -->
+        <article class="panel">
+          <div class="panel-head">
+            <div class="panel-title">웹캠 캡처</div>
+            <span class="chip">표정/시선</span>
+          </div>
+          <div class="frame ratio-4x3">
+            <video id="webcam" autoplay playsinline></video>
+          </div>
+        </article>
+      </div>
+
+      <p class="helper">영상을 끝까지 시청하면 자동으로 결과 페이지로 이동합니다. </p>
+      <p class="helper">영상의 길이가 긴 경우 분석시간이 오래 걸릴 수 있으니 조금만 기다려주세요!</p>
+    </section>
+
+    <div class="footer">© 2025 찰나의 Shortory</div>
+  </main>
+
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+    const taskId = "{{ task_id }}";
+    const youtubeId = "{{ youtube_id }}";
+
+    function getPostId() {
+      const el = document.getElementById('page-meta');
+      if (el && el.dataset.postId) return el.dataset.postId;
+      const qs = new URLSearchParams(location.search).get('post_id');
+      return qs || null;
+    }
+    const postId = getPostId();
+
+    let webcamStream = null;
+    let sendInterval = null;
+    let player = null;
+    let started = false;
+
+    window.onYouTubeIframeAPIReady = function () {
+      player = new YT.Player('player', {
+        videoId: youtubeId,
+        playerVars: { autoplay: 1 },
+        events: { onStateChange: onPlayerStateChange }
+      });
+    };
+
+    function cleanup() {
+      if (sendInterval) { clearInterval(sendInterval); sendInterval = null; }
+      if (webcamStream) {
+        webcamStream.getTracks().forEach(t => t.stop());
+        webcamStream = null;
+      }
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING) {
+        if (!started) {
+          started = true;
+          fetch("/reviewer/start_analysis", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ task_id: taskId })
+          }).catch(()=>{});
+          sendInterval = setInterval(sendFrameToServer, 1000);
+        }
+      } else if (event.data === YT.PlayerState.ENDED) {
+        cleanup();
+        fetch("/reviewer/stop_analysis", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ task_id: taskId })
+        }).finally(() => {
+          if (!postId) {
+            alert('post_id가 템플릿으로 전달되지 않았습니다.');
+            return;
+          }
+          window.location.href = `/reviewer/waiting_analysis/${postId}/${taskId}`;
+        });
+      }
+    }
+
+    const webcam = document.getElementById('webcam');
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then(stream => {
+        webcamStream = stream;
+        webcam.srcObject = stream;
+        return webcam.play().catch(() => {});
+      })
+      .catch(() => {});
+
+    function sendFrameToServer() {
+      if (!webcam.videoWidth) return;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = webcam.videoWidth;
+      canvas.height = webcam.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(webcam, 0, 0);
+      const imageData = canvas.toDataURL("image/jpeg");
+
+      const currentTime = (player && typeof player.getCurrentTime === "function")
+        ? player.getCurrentTime()
+        : 0.0;
+
+      fetch("/reviewer/analyze_frame", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image: imageData,
+          task_id: taskId,
+          video_time: currentTime
+        })
+      }).catch(() => {});
+    }
+
+    window.addEventListener('beforeunload', cleanup);
+  </script>
+</body>
+</html>

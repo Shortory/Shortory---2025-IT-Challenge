@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shortory · 리뷰어 대시보드</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      /* Base (main.html 톤) */
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --r:18px; --shadow:0 20px 60px rgba(15,23,42,.12);
+
+      /* Mint palette */
+      --mint-50:#F4F2EF;
+      --mint-300:#DAFEA4;   /* main */
+      --mint-400:#BFF08A;   /* hover */
+      --sky-300:#94B6EF;    /* sub */
+      --sky-200:#BDE6FF;
+
+      --accent:var(--mint-300);
+      --accent-600:var(--mint-400);
+
+      /* Page gradient */
+      --grad-page:
+        radial-gradient(1200px 600px at 20% -10%, rgba(218,254,164,.45), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(148,182,239,.35), transparent 60%),
+        linear-gradient(180deg,#ffffff 0%,#f8fafc 40%,#f6f7f9 100%);
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Noto Sans KR',system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;
+      color:var(--ink); background:var(--grad-page); min-height:100vh;
+      display:flex; flex-direction:column;
+    }
+
+    /* Header */
+    .site-header{
+      position:sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 24px; background:rgba(255,255,255,.85);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{font-weight:1000; letter-spacing:-.02em; text-decoration:none; color:#2a3a2f; font-size:20px}
+    .logout-btn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:12px; border:1px solid var(--border);
+      background:#fff; color:#e11d48; text-decoration:none; font-weight:900; font-size:.95rem;
+      transition:transform .06s ease, background .15s ease;
+    }
+    .logout-btn:hover{background:#fff5f6; transform:translateY(-1px)}
+
+    /* Container */
+    .container{max-width:1500px; margin:24px auto; padding:0 20px;}
+
+    /* Page hero */
+    .page-hero{
+    justify-content: center;         /* 좌우 여백 없이 중앙 배치 */
+    text-align: center;              /* 내부 텍스트 중앙 정렬 */
+  }
+  .page-hero .left{
+    display: flex;
+    flex-direction: column;          /* 세로 스택으로 변경 => 배지 뒤 줄바꿈 */
+    align-items: center;             /* 가로도 중앙 */
+    gap: 6px;
+  }
+  .page-hero .badge{
+    margin-bottom: 2px;              /* 배지와 제목 사이 살짝 간격 */
+  }
+
+    .left{display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:999px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,#fff,#f8fafc);
+      font-size:.88rem; color:#334155; font-weight:700;
+    }
+    .title{font-size:clamp(20px,2.6vw,28px); font-weight:900; letter-spacing:-.02em}
+    .hello{color:var(--muted); font-weight:700; font-size:.95rem}
+
+    /* Search */
+    .search{
+      display:flex; gap:0; max-width:720px; margin:10px auto 18px auto;
+      border:1px solid var(--border); border-radius:14px; overflow:hidden;
+      background:#fff; box-shadow:0 10px 26px rgba(15,23,42,.06);
+    }
+    .search input[type="text"]{
+      flex:1; padding:12px 14px; font-size:1rem; border:0; outline:none;
+    }
+    .search button{
+      padding:0 16px; border:0; background:var(--accent); color:#0b1220;
+      font-weight:900; cursor:pointer; transition:background .15s ease;
+    }
+    .search button:hover{ background:var(--accent-600); }
+
+    /* Posts grid (배치만 grid로, 구조는 동일) */
+    .posts{
+      display:grid; gap:20px;
+      grid-template-columns:repeat(3,1fr);
+    }
+    @media (max-width:840px){ .posts{grid-template-columns:1fr} }
+
+    .card-link{
+      display:block; text-decoration:none; color:inherit;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.86);
+      border-radius:18px; padding:16px 18px;
+      box-shadow:var(--shadow); transition:transform .08s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .card-link:hover{ transform:translateY(-2px); background:#ffffff; box-shadow:0 20px 60px rgba(15,23,42,.14) }
+    .card-title{font-weight:900; letter-spacing:-.01em; font-size:1.05rem}
+    .empty{
+      text-align:center; color:var(--muted); font-weight:700; margin-top:18px;
+      border:1px solid rgba(255,255,255,.7); background:rgba(255,255,255,.86);
+      border-radius:18px; padding:24px; box-shadow:var(--shadow);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <a class="brand" href="/">Shortory</a>
+    <a href="{{ url_for('auth.logout') }}" class="logout-btn">로그아웃</a>
+  </header>
+
+  <main class="container">
+    <!-- Page hero -->
+    <section class="page-hero">
+  <div class="left">
+    <span class="badge">REVIEWER · DASHBOARD</span>
+    <div>
+      <div class="title">리뷰어 대시보드</div>
+      <div class="hello">안녕하세요, {{ session.username }}님</div>
+    </div>
+  </div>
+</section>
+    <!-- Search (그대로) -->
+    <form class="search" method="get" action="{{ url_for('reviewer.dashboard') }}">
+      <input type="text" name="query" placeholder="제목 검색" value="{{ request.args.get('query', '') }}">
+      <button type="submit">검색</button>
+    </form>
+
+    <!-- Posts (리스트 → 그리드 카드, 링크 구조 유지) -->
+    {% if posts %}
+      <section class="posts">
+        {% for post in posts %}
+          <a class="card-link" href="{{ url_for('reviewer.view_post', post_id=post.id) }}">
+            <div class="card-title">{{ post.title }}</div>
+          </a>
+        {% endfor %}
+      </section>
+    {% else %}
+      <div class="empty">등록된 모집글이 없습니다.</div>
+    {% endif %}
+  </main>
+</body>
+</html>

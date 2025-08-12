@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>모집글 수정</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #222;
+  --muted: #6b7280;
+
+  --primary: #00C8B1;
+  --primary-600: #00b39e;
+  --primary-700: #009e8b;
+
+  --danger: #dc2626;
+  --border: #e5e7eb;
+}
+
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Apple SD Gothic Neo,Malgun Gothic,"Noto Sans KR",sans-serif;
+      line-height:1.6;
+    }
+    .container{max-width:980px; margin:32px auto; padding:0 20px;}
+    .header{
+      display:flex; align-items:center; gap:12px; margin-bottom:18px;
+    }
+    .post-title{
+      font-size:28px; font-weight:800; letter-spacing:-0.2px;
+    }
+    .sub{color:var(--muted); font-size:14px;}
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:18px; padding:22px; box-shadow:0 6px 20px rgba(0,0,0,.04);
+    }
+
+    /* form */
+    .field{margin-bottom:18px;}
+    .label{display:block; font-size:14px; font-weight:700; margin-bottom:8px;}
+    .input, .textarea{
+      width:100%; background:#fff; border:1px solid var(--border);
+      border-radius:12px; padding:12px 14px; font-size:15px; outline:none;
+      transition:border .15s, box-shadow .15s;
+    }
+    .textarea{min-height:140px; resize:vertical; line-height:1.5;}
+    .input:focus, .textarea:focus{
+      border-color:var(--primary-600); box-shadow:0 0 0 4px rgba(124,58,237,.12);
+    }
+
+    /* buttons */
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px; border-radius:10px; border:1px solid transparent;
+      text-decoration:none; cursor:pointer; font-weight:700; font-size:14px;
+      transition:transform .05s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:var(--primary-600); color:#fff;}
+    .btn-primary:hover{background:var(--primary-700);}
+    .btn-secondary{background:#fff; color:#111; border-color:var(--border);}
+    .btn-secondary:hover{border-color:#d1d5db; background:#fafafa;}
+    .btn-danger{background:#fff; color:var(--danger); border-color:#f3d4d4;}
+    .btn-danger:hover{border-color:#f0bcbc; background:#fff5f5;}
+
+    .footer-link{display:inline-flex; align-items:center; gap:6px; color:var(--muted); text-decoration:none; margin-top:16px;}
+    .footer-link:hover{color:#374151}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="post-title">모집글 수정</div>
+      {% if post %}
+        <div class="sub">#{{ post['id'] }}</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      {% if post %}
+        <form method="POST">
+          <div class="field">
+            <label class="label" for="title">영상 제목</label>
+            <input class="input" type="text" id="title" name="title" value="{{ post['title'] }}" required />
+          </div>
+
+          <div class="field">
+            <label class="label" for="description">영상 설명</label>
+            <textarea class="textarea" id="description" name="description" required>{{ post['description'] }}</textarea>
+          </div>
+
+          <div class="field">
+            <label class="label" for="video_link">영상 다운로드 링크(URL)</label>
+            <input class="input" type="url" id="video_link" name="video_link" value="{{ post['video_link'] }}" required />
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-primary">수정 완료</button>
+            <a class="btn btn-secondary" href="{{ url_for('creator.view_post', post_id=post['id']) }}">취소</a>
+          </div>
+        </form>
+      {% else %}
+        <p style="color:#dc2626; font-weight:700;">해당 글을 찾을 수 없습니다.</p>
+        <a class="footer-link" href="{{ url_for('creator.dashboard') }}">← 대시보드로</a>
+      {% endif %}
+    </div>
+
+    {% if post %}
+      <a class="footer-link" href="{{ url_for('creator.view_post', post_id=post['id']) }}">← 글로 돌아가기</a>
+    {% endif %}
+  </div>
+
+  <script>
+    // UX: 설명 자동 높이 조절
+    const ta = document.getElementById('description');
+    if (ta) {
+      const autoResize = el => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; };
+      ta.addEventListener('input', () => autoResize(ta));
+      window.addEventListener('load', () => autoResize(ta));
+    }
+  </script>
+</body>
+</html>

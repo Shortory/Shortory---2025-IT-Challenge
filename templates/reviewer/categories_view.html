@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>저장된 숏폼 클립 · Shortory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      /* Base */
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --r:18px; --shadow:0 20px 60px rgba(15,23,42,.12);
+
+      /* Mint palette (main.html과 동일 톤) */
+      --mint-50:#F4F2EF;
+      --mint-300:#DAFEA4;      /* 메인 민트 */
+      --mint-400:#BFF08A;      /* hover 보조 */
+      --sky-300:#94B6EF;       /* 보조 블루 */
+      --sky-200:#BDE6FF;
+
+      --accent:var(--mint-300);
+      --accent-600:var(--mint-400);
+
+      /* Page gradient */
+      --grad-page:
+        radial-gradient(1200px 600px at 20% -10%, rgba(218,254,164,.45), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(148,182,239,.35), transparent 60%),
+        linear-gradient(180deg,#ffffff 0%,#f8fafc 40%,#f6f7f9 100%);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      color:var(--ink); background:var(--grad-page); min-height:100vh;
+      display:flex; flex-direction:column;
+    }
+
+    /* Header */
+    .site-header{
+      position:sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 28px; background:rgba(255,255,255,.8);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{font-weight:1000; letter-spacing:-.02em; text-decoration:none; color:#2a3a2f; font-size:22px}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px; border-radius:12px; border:1px solid var(--border);
+      background:#fff; color:#0f172a; text-decoration:none; font-weight:900;
+      transition:transform .06s ease, background .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover{background:#f8fafc; transform:translateY(-1px)}
+    .btn.primary{background:var(--accent); border-color:transparent; color:#0b1220; box-shadow:0 8px 26px rgba(75,132,255,.16)}
+    .btn.primary:hover{background:var(--accent-600)}
+
+    /* Container */
+    .container{max-width:1120px; margin:28px auto; padding:0 16px;}
+
+    /* Page hero */
+    .page-hero{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.75); backdrop-filter:blur(8px);
+      border-radius:22px; padding:16px 18px; box-shadow:var(--shadow);
+    }
+    .left{display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:999px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,#fff,#f8fafc);
+      font-size:.9rem; color:#334155; font-weight:700;
+    }
+    .title{font-size:clamp(20px,2.8vw,30px); font-weight:900; letter-spacing:-.02em}
+    .sub{color:var(--muted); font-size:.96rem; font-weight:700}
+
+    /* Grid of clips (작은 타일) */
+    .clips{
+      margin-top:18px;
+      display:grid; gap:12px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    @media (max-width:640px){
+      .clips{grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));}
+    }
+
+    .card{
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.86);
+      border-radius:16px; padding:10px; box-shadow:var(--shadow);
+      backdrop-filter:blur(8px);
+      transition:transform .08s ease, box-shadow .15s ease;
+    }
+    .card:hover{ transform:translateY(-2px); box-shadow:0 14px 36px rgba(15,23,42,.12); }
+
+    .thumb{
+      position:relative; width:100%; border-radius:12px; overflow:hidden; background:#000;
+      aspect-ratio:9/16; /* 숏폼 비율 */
+      box-shadow:0 8px 22px rgba(15,23,42,.18);
+    }
+    .thumb video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block}
+
+    .meta{
+      display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:8px
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:6px; padding:5px 8px; border-radius:999px;
+      border:1px solid var(--border); background:#fff; color:#334155; font-weight:700; font-size:.78rem;
+      max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .time{color:var(--muted); font-size:.8rem; font-weight:700; white-space:nowrap}
+
+    /* Empty state */
+    .empty{
+      margin-top:18px; text-align:center;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.86);
+      border-radius:22px; padding:28px; box-shadow:var(--shadow);
+      color:var(--muted); font-weight:700;
+    }
+
+    /* Footer */
+    .footer{ text-align:center; color:#9aa3ad; font-size:.9rem; margin:24px 0 10px; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <a class="brand" href="/">Shortory</a>
+    <a class="btn" href="{{ url_for('reviewer.dashboard') }}">← 대시보드로</a>
+  </header>
+
+  <main class="container">
+    <!-- Hero -->
+    <section class="page-hero">
+      <div class="left">
+        <span class="badge">MY LIBRARY · CLIPS</span>
+        <div>
+          <div class="title">📂 내 보관함</div>
+          <div class="sub">저장해 둔 숏폼 클립을 확인하고 재생하세요</div>
+        </div>
+      </div>
+      <a class="btn primary" href="{{ url_for('reviewer.dashboard') }}">리뷰 미션으로 가기</a>
+    </section>
+
+    {% if clips and clips|length > 0 %}
+      <!-- Clips grid -->
+      <section class="clips">
+        {% for clip in clips %}
+          <article class="card">
+            <div class="thumb">
+              <video controls preload="metadata">
+                <source src="{{ clip.video_url }}" type="video/mp4">
+                브라우저가 MP4 재생을 지원하지 않습니다.
+              </video>
+            </div>
+            <div class="meta">
+              <span class="pill" title="감정: {{ clip.emotion or '-' }}">감정: {{ clip.emotion or '-' }}</span>
+              <span class="time">{{ clip.saved_at }}</span>
+            </div>
+          </article>
+        {% endfor %}
+      </section>
+    {% else %}
+      <div class="empty">아직 저장된 클립이 없습니다.</div>
+    {% endif %}
+
+    <div class="footer">© 2025 찰나의 Shortory</div>
+  </main>
+</body>
+</html>

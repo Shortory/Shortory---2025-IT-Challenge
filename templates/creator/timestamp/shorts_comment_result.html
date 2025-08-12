@@ -1,0 +1,204 @@
+<!-- templates/timestamp/result.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>댓글 기반 숏폼 결과 · Shortory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --r:18px; --shadow:0 20px 60px rgba(15,23,42,.10);
+
+      --mint-50:#F4F2EF;
+      --mint-300:#DAFEA4;
+      --mint-400:#BFF08A;
+      --sky-300:#94B6EF;
+      --sky-200:#BDE6FF;
+
+      --accent:var(--mint-300);
+      --accent-600:var(--mint-400);
+
+      --fw-title: 800;
+      --fw-strong: 700;
+      --fw-base: 500;
+      --fw-light: 400;
+
+      --grad-page:
+        radial-gradient(1100px 520px at 20% -8%, rgba(218,254,164,.45), transparent 60%),
+        radial-gradient(900px 480px at 85% 8%, rgba(148,182,239,.35), transparent 60%),
+        linear-gradient(180deg,#ffffff 0%,#f8fafc 40%,#f6f7f9 100%);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--ink);
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      background:var(--grad-page);
+      min-height:100vh;
+      letter-spacing:-0.01em;
+    }
+
+    .container{max-width:1120px; margin:28px auto 60px; padding:0 16px;}
+    .narrow{max-width:1040px; margin:0 auto;}
+
+    /* Hero */
+    .page-hero{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.78); backdrop-filter:blur(8px);
+      border-radius:22px; padding:14px 16px; box-shadow:var(--shadow);
+    }
+    .hero-left{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 12px; border-radius:999px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,#fff,#f8fafc);
+      font-size:.88rem; color:#334155; font-weight:600; letter-spacing:-0.01em;
+    }
+    .title{
+      font-size:clamp(18px,2.2vw,24px);
+      font-weight:var(--fw-title);
+      letter-spacing:-0.02em;
+    }
+
+    /* Back button */
+    .back{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 14px; border-radius:14px; text-decoration:none;
+      background:#fff; color:#0b1220; border:1px solid var(--border);
+      font-weight:var(--fw-strong);
+      transition:background .15s ease, transform .06s ease;
+    }
+    .back:hover{ background:#f8fafc; transform:translateY(-1px) }
+
+    /* Grid: 3열 고정 */
+    .grid{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    /* Card & Video */
+    .card{
+      position:relative;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.85);
+      border-radius:22px; padding:12px; box-shadow:var(--shadow);
+      backdrop-filter:blur(8px);
+      transition: transform .12s ease;
+    }
+    .card:hover{ transform: translateY(-3px) }
+
+    .thumb{
+      border-radius: 14px;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;   /* 세로 숏폼은 9 / 16 */
+      width: 100%;
+      margin: 0 auto;
+      box-shadow: 0 6px 18px rgba(15,23,42,.10);
+    }
+    video{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 0;
+    }
+
+    /* Meta & Buttons */
+    .meta{
+      display:flex; align-items:center; justify-content:space-between; gap:8px;
+      margin-top:8px;
+    }
+    .chip{
+      padding: 4px 8px;
+      border-radius:999px;
+      background:#fff; border:1px solid var(--border);
+      font-weight:var(--fw-base);
+      color:#334155; font-size:.8rem;
+      letter-spacing:-0.005em;
+    }
+    .btn{
+      height: 40px;
+      padding: 0 12px;
+      font-size: .9rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      border-radius:14px; border:1px solid var(--border);
+      background:#fff; color:#0f172a; text-decoration:none;
+      display:flex; align-items:center; justify-content:center;
+      transition:transform .06s ease, background .15s ease;
+    }
+    .btn:hover{background:#f8fafc; transform:translateY(-1px)}
+    .btn.primary{
+      background: linear-gradient(135deg, var(--accent) 0%, var(--sky-200) 100%);
+      color:#0b1220; border:1px solid rgba(255,255,255,.6);
+      box-shadow:0 8px 22px rgba(75,132,255,.16);
+    }
+    .btn.primary:hover{
+      background: linear-gradient(135deg, var(--accent-600) 0%, var(--sky-300) 100%);
+    }
+
+    /* Empty */
+    .empty{
+      margin:36px auto; text-align:center;
+      color:var(--muted); font-weight:var(--fw-base);
+      background:rgba(255,255,255,.8); border:1px dashed var(--border);
+      padding:18px; border-radius:16px; max-width:560px;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="narrow">
+      <!-- Hero -->
+      <div class="page-hero">
+        <div class="hero-left">
+          <span class="badge">RESULT · CLIPS</span>
+          <div class="title">🎬 생성된 숏폼 결과</div>
+        </div>
+        <a href="{{ url_for('creator.dashboard') }}" class="back">← 대시보드</a>
+      </div>
+
+      {% if videos_info and videos_info|length > 0 %}
+        <section class="grid">
+          {% for video in videos_info %}
+            {% if 'full_video' not in video.filename %}
+              <article class="card">
+                <div class="thumb">
+                  <video controls preload="metadata">
+                    <source
+                      src="{{ url_for('static', filename='timestamp_output/' ~ task_id ~ '/' ~ video.filename) }}{% if video.ver %}?v={{ video.ver }}{% endif %}"
+                      type="video/mp4">
+                    브라우저가 video 태그를 지원하지 않습니다.
+                  </video>
+                </div>
+
+                <div class="meta">
+                  {% if video.timestamps and video.timestamps|length == 2 %}
+                    <span class="chip">⏱ {{ video.timestamps[0] }} ~ {{ video.timestamps[1] }}</span>
+                  {% elif video.timestamps and video.timestamps|length == 1 %}
+                    <span class="chip">⏱ {{ video.timestamps[0] }} ~ 종료 정보 없음</span>
+                  {% else %}
+                    <span class="chip">⏱ 타임스탬프 없음</span>
+                  {% endif %}
+
+                  <a class="btn primary"
+                     href="{{ url_for('timestamp.download_file', task_id=task_id, filename=video.filename) }}">
+                    다운로드
+                  </a>
+                </div>
+              </article>
+            {% endif %}
+          {% endfor %}
+        </section>
+      {% else %}
+        <div class="empty">❌ 생성된 숏폼이 없습니다.</div>
+      {% endif %}
+    </div>
+  </main>
+</body>
+</html>

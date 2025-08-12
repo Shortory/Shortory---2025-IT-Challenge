@@ -1,0 +1,265 @@
+<!-- templates/reviewer/myroom.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>마이룸 · Shortory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      /* Base (main.html과 톤 맞춤) */
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --r:18px; --shadow:0 20px 60px rgba(15,23,42,.10);
+
+      /* Mint palette */
+      --mint-50:#F4F2EF;
+      --mint-300:#DAFEA4;
+      --mint-400:#BFF08A;
+      --sky-300:#94B6EF;
+      --sky-200:#BDE6FF;
+
+      --accent:var(--mint-300);
+      --accent-600:var(--mint-400);
+
+      /* Page background */
+      --grad-page:
+        radial-gradient(1200px 600px at 20% -10%, rgba(218,254,164,.45), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(148,182,239,.35), transparent 60%),
+        linear-gradient(180deg,#ffffff 0%,#f8fafc 40%,#f6f7f9 100%);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--ink);
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      background:var(--grad-page); min-height:100vh;
+    }
+
+    /* Header */
+    .site-header{
+      position:sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 22px; background:rgba(255,255,255,.8);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{font-weight:1000; letter-spacing:-.02em; text-decoration:none; color:#2a3a2f; font-size:20px}
+
+    /* Narrow wrapper: 전체 폭 축소 + 중앙 정렬 */
+    .container{max-width:1120px; margin:24px auto; padding:0 16px;}
+    .narrow{max-width:860px; margin:0 auto;} /* ≈ 2/3 느낌으로 축소 */
+
+    /* Page hero (상단 정보 띠) */
+    .page-hero{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.75); backdrop-filter:blur(8px);
+      border-radius:22px; padding:14px 16px; box-shadow:var(--shadow);
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:5px;
+      padding:6px 12px; border-radius:999px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,#fff,#f8fafc);
+      font-size:.9rem; color:#334155; font-weight:500;
+    }
+    .hero-title{
+      font-size:clamp(18px,2.2vw,22px); font-weight:900; letter-spacing:-.02em;
+    }
+    .coins{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:14px;
+      background:#fff; border:1px solid var(--border);
+      font-weight:600; color:#0f172a;
+    }
+
+    /* Grid (좌: 캐릭터 / 우: 액션) */
+    .grid{
+      display:grid; gap:16px; margin-top:16px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width:980px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      position:relative;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.78);
+      border-radius:22px; padding:16px; box-shadow:var(--shadow);
+      backdrop-filter:blur(8px);
+    }
+
+    /* 우측 카드: 바깥 폭 살짝 줄여 우측 정렬(컴팩트) */
+    .card.tight{
+      width:100%;
+      margin-left:auto;
+      padding:14px;
+      border-radius:16px;
+    }
+    @media (max-width:980px){
+      .card.tight{ width:90%; margin-left:0; }
+    }
+
+    /* Room (character) */
+    .room{
+      min-height:260px; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      background:
+        radial-gradient(700px 420px at 20% 10%, rgba(218,254,164,.35), transparent 60%),
+        radial-gradient(560px 360px at 90% 0%, rgba(148,182,239,.28), transparent 60%),
+        linear-gradient(135deg,#ffffff 0%,#f9fafb 100%);
+    }
+    .room .chip{
+  position:absolute;
+  top:12px;
+  left:12%;
+  transform:translateX(-50%);
+  background:#fff; border:1px solid var(--border); border-radius:999px;
+  padding:6px 12px; font-weight:800; color:#334155;
+}
+    .character{
+      width:320px; max-width:92%; height:auto; display:block;
+      filter:drop-shadow(0 12px 30px rgba(15,23,42,.18));
+    }
+
+    /* Buttons (단일 민트) */
+    .menu{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
+    @media (max-width:420px){ .menu{grid-template-columns:1fr} }
+    .btn{
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      height:48px; border-radius:14px; border:1px solid var(--border);
+      background:#fff; color:#0f172a; text-decoration:none; font-weight:900;
+      transition:transform .06s ease, background .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover{background:#f8fafc; transform:translateY(-1px)}
+    .btn.primary{
+      background:var(--accent); color:#0b1220; border-color:transparent;
+      box-shadow:0 8px 26px rgba(75,132,255,.16);
+    }
+    .btn.primary {
+  font-weight: 500;     /* 굵기: Medium → 깔끔하게 */
+  font-size: 0.95rem;   /* 크기 살짝 축소 */
+  letter-spacing: -0.01em; /* 자간 살짝 조정 */
+  padding: 0 14px;      /* 좌우 여백 조금 줄이기 */
+  height: 44px;         /* 버튼 높이도 살짝 줄임 */
+}
+
+    /* Info*/
+    .info{
+      margin-top:12px; border:1px dashed var(--border); border-radius:14px; padding:12px;
+      background:linear-gradient(180deg,#fff, #f9fbff);
+      color:#334155; font-size:.82rem;
+    }
+    .info b{font-weight:900}
+    .info ul{margin:8px 0 0 18px; padding:0}
+    .info li{margin:4px 0}
+
+    /* Bottom nav (옵션) */
+    .bottom{
+      position:fixed; left:0; right:0; bottom:0;
+      display:flex; justify-content:center; gap:8px; padding:10px 12px;
+      background:rgba(255,255,255,.85); backdrop-filter:blur(8px);
+      border-top:1px solid var(--border);
+    }
+    .navbtn{
+      background:transparent; border:0; padding:8px 12px; border-radius:10px;
+      color:#6b7280; font-weight:800; cursor:pointer;
+    }
+    .navbtn.active{color:#0f172a; background:#f3f4f6}
+    /* 메인 CTA 전용: 사이즈 업 + 그라디언트 + 강한 그림자 */
+.btn.main-cta{
+  height: 60px;
+  padding: 0 28px;
+  font-size: 1.05rem;
+  border-radius: 18px;
+  letter-spacing: -.01em;
+}
+
+/* 민트 그라디언트 강조 */
+.btn.primary.main-cta{
+  background: linear-gradient(135deg, var(--accent) 0%, var(--sky-200) 100%);
+  color:#0b1220;
+  border:1px solid rgba(255,255,255,.6);
+  box-shadow: 0 12px 34px rgba(75,132,255,.22);
+  transform: translateZ(0);
+}
+.btn.primary.main-cta:hover{
+  background: linear-gradient(135deg, var(--accent-600) 0%, var(--sky-300) 100%);
+  transform: translateY(-2px);
+}
+.btn.main-cta:active{ transform: translateY(0) scale(.99) }
+
+/* 포커스 링 접근성 */
+.btn.main-cta:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(189,230,255,.45), 0 12px 34px rgba(75,132,255,.22);
+}
+
+/* 메뉴 그리드에서 메인 CTA를 한 줄 전체로 */
+.menu .main-cta{ grid-column: 1 / -1; }
+
+/* (선택) 은은한 주목 애니메이션 */
+@keyframes breathe {
+  0%,100% { box-shadow: 0 12px 34px rgba(75,132,255,.20); }
+  50%     { box-shadow: 0 18px 40px rgba(75,132,255,.30); }
+}
+.btn.primary.main-cta.pulse{ animation: breathe 2.2s ease-in-out infinite; }
+
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <a href="/" class="brand">Shortory</a>
+  </header>
+
+  <main class="container">
+    <div class="narrow">
+      <!-- Page hero (가로 폭 축소 + 중앙 정렬) -->
+      <div class="page-hero">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+          <span class="badge">REVIEWER · MY ROOM</span>
+          <div class="hero-title"> 마이룸 </div>
+        </div>
+        <div class="coins">보유 코인 ⭐️ {{ coins|int }}개</div>
+      </div>
+
+      <!-- Grid (가로 폭 축소된 래퍼 안에서 중앙 정렬) -->
+      <section class="grid" style="align-items:start;">
+        <!-- Left: Room -->
+        <article class="card room">
+          <div class="chip">내 캐릭터</div>
+         <img class="character"
+     src="{{ url_for('static', filename='frontend/character04.png') }}"
+     alt="내 캐릭터"
+     style="width: 155px; height: auto;">
+
+        </article>
+
+        <!-- Right: Actions + Info (팔로워/팔로잉 제거) -->
+        <aside class="card tight">
+          <div class="menu">
+            <a class="btn primary" href="{{ url_for('reviewer.dashboard') }}"> 🎯 리뷰 미션 수행</a>
+            <a class="btn primary" href="{{ url_for('reviewer.shop') }}"> 🎁 상점</a>
+          </div>
+
+          <!-- 가시성 강화용 부가 안내 -->
+          <div class="info">
+            <b>TIP</b>
+            <ul>
+              <li>리뷰 미션을 완료하면 코인⭐️을 획득해 <br> 상점에서 아이템을 사용할 수 있어요.</li>
+              <li>상점에서 내 캐릭터 꾸미기 아이템 준비 중..!</li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+    </div>
+  </main>
+
+  <!-- Bottom nav (옵션) -->
+  <nav class="bottom">
+    <button class="navbtn">커뮤니티</button>
+    <button class="navbtn">홈</button>
+    <button class="navbtn active">마이룸</button>
+  </nav>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>타임스탬프 기반 숏폼 생성</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      /* Base */
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --shadow:0 20px 60px rgba(15,23,42,.12);
+
+      /* Mint theme (main.html과 통일) */
+      --mint-300:#00C8B1;     /* main */
+      --mint-400:#00b39e;     /* hover */
+      --sky-200:#BDE6FF;      /* 보조 */
+
+      /* Gradients (히어로) */
+      --grad-hero:
+        radial-gradient(1200px 600px at 20% -10%, rgba(0,200,177,.18), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(189,230,255,.28), transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, #f9fafb 30%, #f6f7f9 100%);
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      color:var(--ink); background:var(--bg);
+      min-height:100vh; display:flex; flex-direction:column;
+    }
+
+    /* Header (심플) */
+    header{
+      position:sticky; top:0; z-index:10;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 24px; background:rgba(255,255,255,.75);
+      backdrop-filter:saturate(180%) blur(8px); border-bottom:1px solid var(--border);
+    }
+    .brand{ font-weight:900; font-size:20px; color:#2a3a2f; text-decoration:none }
+    .dash-link{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:8px 12px; border-radius:10px; border:1px solid var(--border);
+      text-decoration:none; color:#111827; font-weight:700; font-size:14px;
+    }
+    .dash-link:hover{ background:#fafafa }
+
+    /* Hero */
+    .hero{
+      background:var(--grad-hero);
+      display:flex; align-items:center; justify-content:center;
+      padding:50px 16px 72px;
+    }
+    .hero-inner{ width:min(820px, 100%); text-align:center }
+
+    .badge{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 14px; border-radius:999px;
+      background:linear-gradient(180deg,#ffffff,#f8fafc); border:1px solid var(--border);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+      font-weight:600; color:#334155; font-size:.9rem; margin-bottom:14px;
+    }
+
+    .title {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.3; /* 기존 1.1 → 1.3로 여유 */
+  font-size: clamp(22px, 3.2vw, 34px);
+  margin-bottom: 14px; /* 기존 8px → 14px로 간격 확대 */
+}
+
+.subtitle {
+  color: var(--muted);
+  font-size: clamp(14px, 1.4vw, 18px);
+  line-height: 1.6; /* 줄간격 추가 */
+  margin-bottom: 35px; /* 폼과 간격 확보 */
+  font-weight: 500;
+}
+
+    /* Form card */
+    .form-card{
+      margin:0 auto; width:min(860px,100%);
+      background:#fff; border:1px solid var(--border); border-radius:18px;
+      padding:18px; box-shadow:var(--shadow);
+    }
+    .row{
+      display:flex; gap:10px; align-items:center;
+    }
+    @media (max-width:720px){
+      .row{ flex-direction:column; align-items:stretch }
+    }
+    .input{
+      flex:1; min-height:56px; padding:0 16px;
+      border:1px solid #d6dae0; border-radius:12px; font-size:16px;
+      outline:none; background:#fff; transition:border .15s, box-shadow .15s;
+    }
+    .input:focus{ border-color:var(--mint-300); box-shadow:0 0 0 4px rgba(0,200,177,.12) }
+
+    .btn{
+      flex:0 0 auto; min-height:56px; padding:0 22px;
+      border-radius:12px; border:1px solid var(--mint-300);
+      background:var(--mint-300); color:#fff; font-weight:900; font-size:16px;
+      cursor:pointer; transition:transform .08s, background .2s, border-color .2s;
+    }
+    .btn:hover{ transform:translateY(-1px); background:var(--mint-400); border-color:var(--mint-400) }
+
+    .hint{ color:#64748b; font-size:13px; margin-top:10px; text-align:left }
+
+    /* Bottom nav */
+    .bottom{
+      display:flex; justify-content:center; gap:10px; margin:18px 0 10px;
+    }
+    .ghost{
+      display:inline-flex; align-items:center; gap:6px; padding:10px 14px;
+      border-radius:10px; border:1px solid var(--border); background:#fff;
+      color:#111827; text-decoration:none; font-weight:700; font-size:14px;
+    }
+    .ghost:hover{ background:#fafafa }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/" class="brand">Shortory</a>
+    <a href="{{ url_for('creator.dashboard') }}" class="dash-link">← 대시보드로</a>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="badge">TIMESTAMP · SHORTS</span>
+      <h1 class="title">유튜브 Timestamp로 바로 숏폼을 만들어요</h1>
+      <p class="subtitle">댓글의 타임스탬프 신호를 분석해 하이라이트를 자동으로 추출합니다</p>
+
+      <form class="form-card" action="{{ url_for('timestamp.shorts_comment') }}" method="post" autocomplete="off">
+        <div class="row">
+          <input
+            class="input"
+            type="text"
+            name="youtube_url"
+            placeholder="https://www.youtube.com/watch?v=..."
+            required
+          />
+          <button class="btn" type="submit">분석 시작</button>
+        </div>
+        <div class="hint">timestamp가 있는 공개된 영상만 지원 · 너무 긴 영상은 처리 시간이 길어질 수 있어요</div>
+      </form>
+
+      <div class="bottom">
+        <a class="ghost" href="{{ url_for('creator.dashboard') }}">← 대시보드로 돌아가기</a>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

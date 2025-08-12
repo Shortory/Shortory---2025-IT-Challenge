@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shortory - 로그인</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f9f9fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-wrapper {
+      width: 360px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+    }
+    .login-wrapper h2 {
+      font-size: 24px;
+      color: #00C8B1;
+      margin-bottom: 24px;
+    }
+    #login-form input[type="text"],
+    #login-form input[type="password"] {
+      width: 100%;
+      height: 48px;
+      padding: 0 12px;
+      margin-bottom: 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #f8f8f8;
+      font-size: 1rem;
+    }
+    #login-form input::placeholder {
+      color: #bbb;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-right: 8px;
+      accent-color: #00C8B1;
+      cursor: pointer;
+    }
+    #login-form input[type="submit"] {
+      width: 100%;
+      height: 48px;
+      background-color: #00C8B1;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #login-form input[type="submit"]:hover {
+      background-color: #00b39e;
+    }
+    .signup-link {
+      display: block;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #00C8B1;
+      text-decoration: none;
+    }
+    .signup-link:hover {
+      text-decoration: underline;
+    }
+    .back-home {
+      display: block;
+      margin-top: 30px;
+      font-size: 0.9rem;
+      color: #777;
+      text-decoration: none;
+    }
+    .back-home:hover {
+      text-decoration: underline;
+    }
+    .error-msg {
+      margin-bottom: 16px;
+      color: red;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <h2>{{ '크리에이터' if role == 'creator' else '리뷰어' }} 로그인</h2>
+
+    <form id="login-form" method="post" action="{{ url_for('auth.login', role=role) }}">
+      <input type="hidden" name="role" value="{{ role }}">
+      {% if msg %}
+        <div class="error-msg">{{ msg }}</div>
+      {% endif %}
+      <input type="text" name="userName" placeholder="ID" required>
+      <input type="password" name="userPassword" placeholder="Password" required>
+      <div class="checkbox-group">
+        <input type="checkbox" id="remember-check" name="rememberMe">
+        <label for="remember-check">아이디 저장하기</label>
+      </div>
+      <input type="submit" value="Login">
+    </form>
+
+    <a href="{{ url_for('auth.signup', role=role) }}" class="signup-link">회원가입</a>
+    <a href="/" class="back-home">🏠 홈으로 돌아가기</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ post.title }} · Shortory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      /* Base */
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --r:18px; --shadow:0 20px 60px rgba(15,23,42,.12);
+
+      /* Mint palette */
+      --mint-50:#F4F2EF;
+      --mint-300:#DAFEA4;      /* 메인 민트 */
+      --mint-400:#BFF08A;      /* hover 보조 */
+      --sky-300:#94B6EF;       /* 보조 블루 */
+      --sky-200:#BDE6FF;
+
+      --accent:var(--mint-300);
+      --accent-600:var(--mint-400);
+
+      /* Page gradient */
+      --grad-page:
+        radial-gradient(1200px 600px at 20% -10%, rgba(218,254,164,.45), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(148,182,239,.35), transparent 60%),
+        linear-gradient(180deg,#ffffff 0%,#f8fafc 40%,#f6f7f9 100%);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      color:var(--ink); background:var(--grad-page); min-height:100vh;
+      display:flex; flex-direction:column;
+    }
+
+    /* Header */
+    .site-header{
+      position:sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 28px; background:rgba(255,255,255,.8);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{font-weight:1000; letter-spacing:-.02em; text-decoration:none; color:#2a3a2f; font-size:22px}
+
+    /* Buttons */
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:12px 20px; border-radius:12px; border:1px solid var(--border);
+      background:#fff; color:#0f172a; text-decoration:none; font-weight:700;
+      transition:transform .06s ease, background .15s ease, box-shadow .15s ease;
+      cursor: pointer; font-size: 1rem; font-family: inherit;
+    }
+    .btn:hover{background:#f8fafc; transform:translateY(-1px)}
+    .btn.primary{background:var(--accent); border-color:transparent; color:#0b1220; box-shadow:0 8px 26px rgba(75,132,255,.16)}
+    .btn.primary:hover{background:var(--accent-600)}
+    .btn.secondary{background:#f1f5f9; border-color:#e2e8f0; color:#475569}
+    .btn.secondary:hover{background:#e2e8f0}
+
+    /* Container */
+    .container{max-width:800px; margin:28px auto; padding:0 16px;}
+
+    /* Post card */
+    .post-card{
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.86); backdrop-filter:blur(8px);
+      border-radius:22px; padding:32px; box-shadow:var(--shadow);
+      margin-bottom:24px;
+    }
+
+    /* Title */
+    .post-title{
+      font-size:clamp(24px,3.2vw,36px); font-weight:900;
+      letter-spacing:-.02em; margin-bottom:16px;
+      background:linear-gradient(135deg,#2a3a2f,var(--mint-400));
+      -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    }
+
+    /* Description */
+    .post-description{
+      font-size:1.1rem; line-height:1.7; color:#374151;
+      margin-bottom:32px; font-weight:500;
+    }
+
+    /* Info box */
+    .info-box{
+      background:linear-gradient(135deg,rgba(218,254,164,.2),rgba(148,182,239,.15));
+      border:1px solid rgba(218,254,164,.4);
+      border-radius:16px; padding:20px; margin-bottom:24px;
+      position:relative; overflow:hidden;
+    }
+    .info-box::before{
+      content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+      background:linear-gradient(180deg,var(--accent),var(--sky-300));
+    }
+    .info-box p{margin-bottom:12px; font-weight:600; color:#1f2937}
+    .info-box p:last-child{margin-bottom:0}
+
+    /* Download link */
+    .download-link{
+      display:inline-flex; align-items:center; gap:8px;
+      color:var(--accent-600); text-decoration:none; font-weight:700;
+      padding:8px 16px; border-radius:12px;
+      background:rgba(191,240,138,.15); border:1px solid rgba(191,240,138,.3);
+      transition:all .15s ease;
+    }
+    .download-link:hover{
+      background:rgba(191,240,138,.25); transform:translateY(-1px);
+    }
+
+    /* Button group */
+    .button-group{
+      display:flex; gap:12px; flex-wrap:wrap; margin-top:24px;
+    }
+
+    /* Form styling */
+    form{display:inline-block}
+
+    /* Badge */
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:999px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,#fff,#f8fafc);
+      font-size:.85rem; color:#334155; font-weight:700;
+      margin-bottom:16px;
+    }
+
+    /* Footer */
+    .footer{
+      text-align:center; color:#9aa3ad; font-size:.9rem;
+      margin:24px 0 10px; font-weight:500;
+    }
+
+    /* Responsive */
+    @media (max-width:640px){
+      .container{padding:0 12px}
+      .post-card{padding:24px 20px; border-radius:16px}
+      .button-group{flex-direction:column}
+      .btn{justify-content:center; text-align:center}
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <a class="brand" href="/">Shortory</a>
+    <a class="btn" href="{{ url_for('reviewer.dashboard') }}">← 대시보드로</a>
+  </header>
+
+  <main class="container">
+    <!-- Post Content -->
+    <article class="post-card">
+      <span class="badge">📋 REVIEW MISSION</span>
+
+      <h1 class="post-title">{{ post.title }}</h1>
+      <p class="post-description">{{ post.description }}</p>
+
+      {% if not has_accepted %}
+        <!-- 리뷰 신청 버튼 -->
+        <form method="POST" action="{{ url_for('reviewer.accept_post', post_id=post.id) }}">
+          <button type="submit" class="btn primary">🎯 리뷰하기</button>
+        </form>
+      {% else %}
+        <div class="info-box">
+          <p><strong>✅ 리뷰를 신청한 상태입니다.</strong></p>
+          <p>아래 링크에서 영상을 다운로드하여 분석을 진행하세요.</p>
+          <a href="{{ post.video_link }}" class="download-link" download>
+            🎬 영상 다운로드하기
+          </a>
+        </div>
+
+        <!-- 영상 분석하러 가기 버튼 -->
+        <a href="{{ url_for('reviewer.start_analysis_from_post', post_id=post.id) }}" class="btn primary">🔍 영상 분석하러 가기</a>
+      {% endif %}
+
+      <div class="button-group">
+        <a href="{{ url_for('reviewer.dashboard') }}" class="btn secondary">← 대시보드로 돌아가기</a>
+      </div>
+    </article>
+
+    <div class="footer">© 2025 찰나의 Shortory</div>
+  </main>
+</body>
+</html>

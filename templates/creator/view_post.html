@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ post.id }} - 모집글 상세</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary: #00C8B1; 
+      --muted: #64748b; 
+      --danger: #ef4444; 
+      --ok: #10b981;
+      --border: #e5e7eb;
+      --bg: #fafafa;
+      --star: #fbbf24; /* 금색 */
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 28px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+      color: #0f172a; background: #fff;
+    }
+    h1 { margin: 0 0 6px; font-size: 28px; }
+    .meta { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+    .bar { display: flex; gap: 10px; margin: 8px 0 24px; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 12px; border: 1px solid var(--border);
+      border-radius: 10px; background: #fff; color: #111827;
+      text-decoration: none; font-size: 14px; cursor: pointer;
+      transition: 120ms ease-in-out;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+    .btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn.danger { background: #fff; color: var(--danger); border-color: #fecaca; }
+    .section-title { font-size: 22px; margin: 24px 0 12px; }
+
+    table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    th { text-align: left; font-weight: 600; color: #111827; background: #fafafa; }
+    tr:hover td { background: #fcfcff; }
+
+    /* 별점 */
+    .rating-wrap { display: flex; align-items: center; gap: 10px; }
+    .stars { display: inline-flex; gap: 2px; }
+    .star {
+      appearance: none; -webkit-appearance: none;
+      width: 28px; height: 28px; line-height: 28px;
+      border: 0; background: transparent; cursor: pointer;
+      font-size: 24px; color: #d1d5db; /* 회색 빈 별 */
+      padding: 0; margin: 0; transition: transform .08s ease;
+    }
+    .star:hover { transform: scale(1.08); }
+    .star.on, .star.hover { color: var(--star); } /* 채움 */
+    .rate-submit {
+      padding: 8px 12px; border-radius: 10px; font-size: 13px;
+      border: 1px solid var(--border); background: #fff; cursor: pointer;
+    }
+    .rate-submit.saved { border-color: #bbf7d0; color: var(--ok); background: #f0fdf4; }
+    .pill {
+      display: inline-block; padding: 6px 10px; border-radius: 999px;
+      font-size: 12px; border: 1px solid var(--border); color: #111827; background: #fff;
+    }
+    .pill.ok { color: var(--ok); border-color: #bbf7d0; background: #f0fdf4; }
+    .right { text-align: right; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+  </style>
+</head>
+<body>
+
+  <h1>{{ post.title }}</h1>
+  <div class="meta">
+    작성일: {{ post.created_at }} · 모집 상태:
+    <strong>{% if post.is_recruiting %}모집 중{% else %}모집 완료{% endif %}</strong>
+  </div>
+
+  <div class="bar">
+    {% if post.video_link %}
+      <a class="btn" href="{{ post.video_link }}" target="_blank" rel="noopener">🎬 영상 다운로드 링크</a>
+    {% endif %}
+    <form method="post" action="{{ url_for('creator.toggle_recruiting', post_id=post.id) }}" style="display:inline">
+      <button class="btn primary" type="submit">{% if post.is_recruiting %}리뷰어 모집 완료하기{% else %}모집 재개하기{% endif %}</button>
+    </form>
+    <a class="btn" href="{{ url_for('creator.edit_post', post_id=post.id) }}">✏️ 글 수정하기</a>
+    <form method="post" action="{{ url_for('creator.delete_post', post_id=post.id) }}" style="display:inline" onsubmit="return confirm('정말 삭제할까요?')">
+      <button class="btn danger" type="submit">🗑 글 삭제하기</button>
+    </form>
+  </div>
+
+  <h2 class="section-title">이 글에 리뷰를 신청한 리뷰어</h2>
+
+  <div class="table">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%">리뷰어</th>
+          <th style="width:26%">이메일</th>
+          <th style="width:18%">리뷰 상태</th>
+          <th style="width:18%">결과</th>
+          <th style="width:18%">별점 주기</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reviewers %}
+        <tr>
+          <td>{{ r.reviewer_name }}</td>
+          <td>{{ r.reviewer_email }}</td>
+          <td>
+            {% if r.is_submitted %}
+              <span class="pill ok">제출 완료 ({{ r.submitted_count or 0 }}개)</span>
+            {% else %}
+              <span class="pill">제출 대기</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if r.is_submitted %}
+              <a class="btn" href="{{ url_for('creator.review_result', post_id=post.id, reviewer_id=r.reviewer_id) }}">결과보기</a>
+            {% else %}
+              -
+            {% endif %}
+          </td>
+
+          <td class="right">
+            {% if is_owner %}
+              <form class="rating-form" autocomplete="off">
+                <input type="hidden" name="post_id" value="{{ post.id }}">
+                <input type="hidden" name="reviewer_id" value="{{ r.reviewer_id }}">
+                <!-- 서버에 기존 평점을 가져온다면 여기에 채워 넣으세요: r.current_rating -->
+                <input type="hidden" name="rating" value="{{ r.current_rating or 0 }}">
+
+                <div class="rating-wrap">
+                  <div class="stars" role="radiogroup" aria-label="별점">
+                    {% for n in range(1,6) %}
+                      <button type="button" class="star{% if (r.current_rating or 0) >= n %} on{% endif %}" data-value="{{ n }}" aria-label="{{ n }}점">★</button>
+                    {% endfor %}
+                  </div>
+                  <button type="button" class="rate-submit">평점 저장</button>
+                </div>
+              </form>
+            {% else %}
+              -
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:18px;">
+    <a class="btn" href="{{ url_for('creator.dashboard') }}">← 대시보드로 돌아가기</a>
+  </div>
+
+  <script>
+    // 별 클릭 시 값 반영 + 시각적 채움
+    document.addEventListener('click', (e) => {
+      const star = e.target.closest('.star');
+      if (!star) return;
+
+      const starsWrap = star.closest('.stars');
+      const form = star.closest('.rating-form');
+      const ratingInput = form.querySelector('input[name="rating"]');
+      const value = Number(star.dataset.value);
+
+      // 1~5 범위 보장
+      const clamped = Math.min(5, Math.max(1, value));
+      ratingInput.value = clamped;
+
+      // 채움 상태 반영
+      starsWrap.querySelectorAll('.star').forEach(s => {
+        const v = Number(s.dataset.value);
+        s.classList.toggle('on', v <= clamped);
+      });
+    });
+
+    // 평점 저장 (비동기)
+    document.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.rate-submit');
+      if (!btn) return;
+
+      const form = btn.closest('.rating-form');
+      const fd = new FormData(form);
+
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = '저장 중...';
+
+      try {
+        const res = await fetch('{{ url_for("creator.rate_reviewer") }}', {
+          method: 'POST',
+          body: fd
+        });
+        const json = await res.json();
+
+        if (!res.ok || !json.ok) {
+          alert(json.msg || '저장에 실패했습니다.');
+          btn.disabled = false;
+          btn.textContent = original;
+          return;
+        }
+
+        btn.classList.add('saved');
+        btn.textContent = '저장됨 ✓';
+        // 잠시 후 원복
+        setTimeout(() => {
+          btn.classList.remove('saved');
+          btn.textContent = original;
+          btn.disabled = false;
+        }, 1200);
+
+      } catch (err) {
+        console.error(err);
+        alert('네트워크 오류로 저장에 실패했습니다.');
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
+  </script>
+</body>
+</html>

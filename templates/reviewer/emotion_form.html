@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>감정 분석 기반 숏폼 제작 · Shortory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      /* Base */
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --r:18px; --shadow:0 20px 60px rgba(15,23,42,.12);
+
+      /* Mint palette (main.html 톤) */
+      --mint-50:#F4F2EF;
+      --mint-300:#DAFEA4;  /* main */
+      --mint-400:#BFF08A;  /* hover */
+      --sky-300:#94B6EF;   /* sub */
+      --sky-200:#BDE6FF;
+
+      --accent:var(--mint-300);
+      --accent-600:var(--mint-400);
+
+      /* Page gradient */
+      --grad-page:
+        radial-gradient(1200px 600px at 20% -10%, rgba(218,254,164,.45), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(148,182,239,.35), transparent 60%),
+        linear-gradient(180deg,#ffffff 0%,#f8fafc 40%,#f6f7f9 100%);
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      color:var(--ink); background:var(--grad-page); min-height:100vh;
+      display:flex; flex-direction:column;
+    }
+
+    /* Header */
+    /* Header */
+.site-header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 24px;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:saturate(180%) blur(10px);
+
+  /* 기존 border-bottom 제거 */
+  border-bottom:none;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+    .brand{font-weight:1000; letter-spacing:-.02em; text-decoration:none; color:#2a3a2f; font-size:20px}
+
+    /* Container */
+    .container{max-width:1120px; margin:0 auto; padding:0 16px 48px;}
+
+    /* 단일 카드 */
+    .single-card{
+      margin: 0 auto;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.86);
+      border-radius:22px; padding:22px;
+      box-shadow:var(--shadow); backdrop-filter:blur(8px);
+    }
+    /* 카드 위치 더 아래로: 수치만 바꿔서 자유롭게 조정 */
+    .push-down{ margin-top: clamp(56px, 12vh, 240px); }
+
+    .card-head{ text-align:center; margin-bottom:20px }
+    .title{ font-weight:900; font-size:clamp(22px,2.8vw,30px); letter-spacing:-.02em }
+    .sub{ color:var(--muted); font-weight:700; margin-top:6px; font-size:.98rem }
+
+    form{ margin-top:14px }
+    label{ display:block; font-size:.92rem; font-weight:800; color:#334155; margin:10px 2px 8px }
+    .row{
+      display:flex; gap:10px; align-items:center;
+      border:1px solid var(--border); border-radius:14px; padding:8px; background:#fff;
+      box-shadow:0 10px 26px rgba(15,23,42,.06);
+    }
+    .input{
+      flex:1; border:0; outline:0; padding:12px 12px; font-size:1rem;
+      border-radius:10px; min-width:0;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:12px 16px; border-radius:12px; border:1px solid transparent;
+      background:#fff; color:#0f172a; text-decoration:none; font-weight:900;
+      cursor:pointer; transition:transform .06s ease, background .15s ease, box-shadow .15s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform:translateY(-1px) }
+    .btn.primary{ background:var(--accent); color:#0b1220; box-shadow:0 10px 28px rgba(75,132,255,.16) }
+    .btn.primary:hover{ background:var(--accent-600) }
+
+    @media (max-width:680px){
+      .row{ flex-direction:column; align-items:stretch }
+      .btn{ width:100% }
+    }
+
+    /* 푸터 */
+    .footer{ text-align:center; color:#9aa3ad; font-size:.9rem; margin:28px 0 16px }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <a href="/" class="brand">Shortory</a>
+    <div style="height:1px"></div>
+  </header>
+
+  <main class="container">
+    <!-- 단일 박스: 헤더+폼 -->
+    <section class="single-card push-down">
+      <div class="card-head">
+        <div class="title">감정 분석 기반 숏폼 제작</div>
+        <div class="sub">크리에이터가 등록한 YouTube URL을 입력해 감정·시선 데이터를 기반으로 하이라이트를 추출합니다</div>
+      </div>
+
+      <form method="post" action="{{ url_for('reviewer.analyze_url') }}">
+        <input type="hidden" name="post_id" value="{{ post_id }}">
+        <label for="youtube_url">YouTube URL</label>
+
+        <div class="row">
+          <input
+            class="input"
+            type="text"
+            id="youtube_url"
+            name="youtube_url"
+            placeholder="https://www.youtube.com/watch?v=..."
+            required
+            autocomplete="off"
+          />
+          <button type="submit" class="btn primary">분석 시작</button>
+        </div>
+      </form>
+    </section>
+
+  </main>
+</body>
+</html>

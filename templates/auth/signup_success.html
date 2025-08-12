@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>회원가입 완료</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f9f9fb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .success-wrapper {
+      width: 400px;
+      background: white;
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .success-wrapper h2 {
+      color: #00C8B1;
+      margin-bottom: 24px;
+    }
+    a {
+      display: inline-block;
+      padding: 14px 30px;
+      background-color: #00C8B1;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    a:hover {
+      background-color: #00b39e;
+    }
+  </style>
+</head>
+<body>
+  <div class="success-wrapper">
+    <h2>회원가입이 완료되었습니다!</h2>
+    <a href="{{ url_for('auth.login', role=role) }}">로그인하기</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+﻿.idea/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+
+# 업로드/산출물(추적 제외)
+reviewer/emotion_uploads/
+reviewer/logs/
+reviewer/focus_analysis_results/
+reviewer/object_detection_results/
+reviewer/static/shorts_output/
+static/shorts_output/
+static/timestamp_output/
+timestamp_uploads/
+
+# 모델/가중치(필요시 LFS 사용)
+reviewer/models/
+yolov8n.pt
+timestamp/yolov8n.pt

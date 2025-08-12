@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>등록 완료</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#f6f7fb; --card:#ffffff; --text:#222; --muted:#6b7280;
+      --border:#e5e7eb;
+
+      /* 민트 계열 */
+      --mint:#00C8B1;
+      --mint-hover:#00b39e;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Apple SD Gothic Neo,Malgun Gothic,"Noto Sans KR",sans-serif;
+      line-height:1.6;
+      display:flex; align-items:center; justify-content:center; min-height:100vh;
+    }
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:18px; padding:32px 28px; max-width:480px; text-align:center;
+      box-shadow:0 6px 20px rgba(0,0,0,.04);
+    }
+    h2{
+      font-size:24px; font-weight:800; margin-bottom:12px;
+    }
+    p{
+      color:var(--muted); margin-bottom:24px; font-size:15px;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 16px; border-radius:10px; border:1px solid transparent;
+      text-decoration:none; cursor:pointer; font-weight:700; font-size:14px;
+      transition:transform .05s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+    }
+    .btn:active{transform:translateY(1px);}
+    .btn-primary{
+      background:var(--mint);
+      color:#fff;
+    }
+    .btn-primary:hover{
+      background:var(--mint-hover);
+    }
+    .footer-link{
+      display:inline-flex; align-items:center; gap:6px; color:var(--muted);
+      text-decoration:none; margin-top:18px; font-size:14px;
+    }
+    .footer-link:hover{color:#374151;}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>등록이 완료되었습니다! 🎉</h2>
+    <p>리뷰어 모집글이 성공적으로 등록되었습니다.</p>
+
+    <a href="{{ url_for('creator.view_post', post_id=post_id) }}" class="btn btn-primary">
+      등록한 글 확인하기
+    </a>
+
+    <br>
+    <a href="{{ url_for('creator.dashboard') }}" class="footer-link">← 대시보드로 돌아가기</a>
+  </div>
+</body>
+</html>

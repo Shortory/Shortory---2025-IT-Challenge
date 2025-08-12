@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>분석 결과 · Shortory</title>
+  <style>
+    :root{
+      /* Base */
+      --ink:#1d1f21; --muted:#5b6068; --bg:#ffffff; --border:#eceff3;
+      --r:18px; --shadow:0 20px 60px rgba(15,23,42,.12);
+
+      /* Mint palette (main.html 톤) */
+      --mint-50:#F4F2EF;
+      --mint-300:#DAFEA4;
+      --mint-400:#BFF08A;
+      --sky-300:#94B6EF;
+      --sky-200:#BDE6FF;
+
+      --accent:var(--mint-300);
+      --accent-600:var(--mint-400);
+
+      /* Page gradient */
+      --grad-page:
+        radial-gradient(1200px 600px at 20% -10%, rgba(218,254,164,.45), transparent 60%),
+        radial-gradient(900px 500px at 85% 10%, rgba(148,182,239,.35), transparent 60%),
+        linear-gradient(180deg,#ffffff 0%,#f8fafc 40%,#f6f7f9 100%);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+      color:var(--ink); background:var(--grad-page); min-height:100vh;
+      display:flex; flex-direction:column;
+    }
+
+    /* Header */
+    .site-header{
+      position:sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 28px; background:rgba(255,255,255,.8);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .brand{font-weight:1000; letter-spacing:-.02em; text-decoration:none; color:#2a3a2f; font-size:22px}
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 14px; border-radius:12px; border:1px solid var(--border);
+      background:#fff; color:#0f172a; text-decoration:none; font-weight:900;
+      transition:transform .06s ease, background .15s ease, box-shadow .15s ease;
+      cursor:pointer;
+    }
+    .btn:hover{background:#f8fafc; transform:translateY(-1px)}
+    .btn.primary{background:var(--accent); border-color:transparent; color:#0b1220; box-shadow:0 10px 30px rgba(75,132,255,.16)}
+    .btn.primary:hover{background:var(--accent-600)}
+
+    /* Container */
+    .container{max-width:1120px; margin:28px auto; padding:0 16px;}
+
+    /* Page hero */
+    .page-hero{
+      display:flex; align-items:center; justify-content:space-between; gap:20px;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.75); backdrop-filter:blur(8px);
+      border-radius:22px; padding:16px 20px; box-shadow:var(--shadow);
+    }
+    .page-hero .sub{ display:flex; flex-direction:column; gap:2px; }
+    .left{display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap}
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 12px; border-radius:999px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,#fff,#f8fafc);
+      font-size:.9rem; color:#334155; font-weight:700;
+    }
+    .title{font-size:clamp(20px,2.8vw,28px); font-weight:700; letter-spacing:-.02em}
+    .sub{color:var(--muted); font-size:.96rem; font-weight:700}
+
+    .meta-inline{color:#334155; font-weight:600}
+
+    /* Grid of result clips (조금 더 큰 타일) */
+    .clips{
+      margin-top:18px;
+      display:grid; gap:14px;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+    @media (max-width:640px){
+      .clips{grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));}
+    }
+
+    .card{
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.9);
+      border-radius:18px; padding:12px; box-shadow:var(--shadow);
+      backdrop-filter:blur(8px);
+      transition:transform .08s ease, box-shadow .15s ease;
+      text-align:center;
+    }
+    .card:hover{ transform:translateY(-2px); box-shadow:0 18px 40px rgba(15,23,42,.12); }
+
+    .select-row{
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      margin-bottom:8px; color:#1B3444; font-weight:800; font-size:.92rem;
+    }
+    .select-row input[type="checkbox"]{ transform:scale(1.15); cursor:pointer }
+
+    .thumb{
+      position:relative; width:100%; border-radius:14px; overflow:hidden; background:#000;
+      aspect-ratio:9/16;
+      box-shadow:0 8px 22px rgba(15,23,42,.18);
+      margin:0 auto 8px;
+    }
+    .thumb video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block}
+
+    .emotion{font-weight:900; color:#1B3444; margin-top:4px}
+    .timestamp{font-size:.85rem; color:#333; margin-top:2px}
+    .filename{font-size:.78rem; color:#555; margin-top:4px}
+
+    .btn-save{
+      margin-top:8px; padding:8px 12px; border-radius:10px; border:1px solid var(--border);
+      background:#fff; color:#0f172a; font-weight:900; cursor:pointer;
+      transition:background .15s ease, transform .06s ease;
+    }
+    .btn-save:hover:not(:disabled){ background:#f8fafc; transform:translateY(-1px) }
+    .btn-save:disabled{ background:#e5e7eb; color:#9ca3af; cursor:default }
+
+    /* Action row */
+    .actions{
+      display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap;
+      margin:22px 0 8px;
+    }
+    .hint{ text-align:center; color:#1B3444; font-weight:700; margin-top:6px }
+
+    /* Empty state */
+    .empty{
+      margin-top:18px; text-align:center;
+      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.86);
+      border-radius:22px; padding:28px; box-shadow:var(--shadow);
+      color:var(--muted); font-weight:700;
+    }
+
+    /* Footer */
+    .footer{ text-align:center; color:#9aa3ad; font-size:.9rem; margin:24px 0 10px; }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <a class="brand" href="/">Shortory</a>
+    <a class="btn" href="{{ url_for('reviewer.dashboard') }}">← 대시보드로</a>
+  </header>
+
+  <main class="container">
+    <!-- post_id 안전 전달 -->
+    <div id="page-meta" data-post-id="{{ post_id }}"></div>
+
+    <!-- Hero -->
+    <section class="page-hero">
+  <div class="left">
+    <span class="badge">RESULT · CLIPS</span>
+    <div>
+      <div class="title">📋 분석 결과</div>
+
+      <!-- 문장별 줄바꿈 -->
+      <div class="sub">
+        {% if videos %}
+          <div>총 <span class="meta-inline">{{ videos|length }}</span>개의 숏폼이 생성되었습니다.</div>
+        {% else %}
+          <div>아직 생성된 숏폼이 없습니다.</div>
+        {% endif %}
+
+        {% if elapsed_time %}
+          <div>소요 시간: <span class="meta-inline">{{ elapsed_time }}</span></div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <a class="btn primary hero-cta" href="{{ url_for('result.categories_view') }}">
+    📂 보관함
+  </a>
+</section>
+
+
+    {% if videos %}
+      <!-- Clips grid -->
+      <section class="clips">
+        {% for video in videos %}
+          <article class="card">
+            <!-- 제출 선택 -->
+            <div class="select-row">
+              <input
+                type="checkbox"
+                name="clip_ids"
+                value="{{ video['id'] }}"
+                id="clip_{{ loop.index }}"
+              />
+              <label for="clip_{{ loop.index }}">크리에이터에게 제출</label>
+            </div>
+
+            <div class="thumb">
+              <video controls autoplay muted loop preload="metadata">
+                <source src="{{ url_for('static', filename='shorts_output/' ~ task_id ~ '/' ~ video['filename']) }}" type="video/mp4">
+                브라우저가 video 태그를 지원하지 않습니다.
+              </video>
+            </div>
+
+            <div class="emotion">{{ video['emotion'] }}</div>
+            <div class="timestamp">영상 시점: {{ video['timestamp'] }}</div>
+            <div class="filename">{{ video['filename'] }}</div>
+
+            <!-- 개인 보관함 저장 -->
+            <button
+              class="btn-save"
+              data-filename="{{ video['filename'].split('/')[-1] }}"
+              data-emotion="{{ video['emotion'] }}"
+              data-task-id="{{ task_id }}"
+            >보관함에 저장</button>
+          </article>
+        {% endfor %}
+      </section>
+
+      <!-- 제출/탐색 액션 -->
+      <div class="actions">
+        <button id="submit-to-creator" class="btn primary">선택한 클립 크리에이터에게 제출</button>
+        <a href="{{ url_for('result.categories_view') }}" class="btn">📂 저장된 클립 보관함 보기</a>
+        <a href="{{ url_for('reviewer.dashboard') }}" class="btn">🔙 처음으로 돌아가기</a>
+      </div>
+      <div class="hint">※ 최소 1개, 최대 3개까지 선택할 수 있습니다.</div>
+
+    {% else %}
+      <div class="empty">
+        아직 생성된 숏폼이 없습니다.
+        <div style="margin-top:10px;">
+          <a href="{{ url_for('result.categories_view') }}" class="btn">📂 저장된 클립 보관함 보기</a>
+          <a href="{{ url_for('reviewer.dashboard') }}" class="btn" style="margin-left:6px;">🔙 처음으로 돌아가기</a>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="footer">© 2025 찰나의 Shortory</div>
+  </main>
+
+  <!-- 보관함 저장 스크립트 (기존 유지) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const saveButtons = document.querySelectorAll('.btn-save');
+
+      saveButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          if (button.disabled) return;
+
+          const filename = button.getAttribute('data-filename');
+          const emotion  = button.getAttribute('data-emotion');
+          const taskId   = button.getAttribute('data-task-id');
+
+          fetch('{{ url_for("result.save_clip") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename, emotion, task_id: taskId })
+          })
+          .then(r => r.json())
+          .then(data => {
+            if (data.status === 'success') {
+              button.textContent = '저장됨';
+              button.disabled = true;
+            } else {
+              alert('저장 중 오류가 발생했습니다:\\n' + (data.message || ''));
+            }
+          })
+          .catch(() => alert('네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'));
+        });
+      });
+    });
+  </script>
+
+  <!-- 선택 제출 스크립트 -->
+  <script>
+    function getPostId() {
+      const el = document.getElementById('page-meta');
+      if (el && el.dataset.postId) return el.dataset.postId;
+      const qs = new URLSearchParams(location.search).get('post_id');
+      return qs || null;
+    }
+
+    const submitBtn = document.getElementById('submit-to-creator');
+    if (submitBtn) {
+      submitBtn.addEventListener('click', async () => {
+        const checked = Array.from(document.querySelectorAll('input[name="clip_ids"]:checked')).map(el => el.value);
+        if (checked.length < 1 || checked.length > 3) {
+          alert('최소 1개, 최대 3개를 선택하세요.');
+          return;
+        }
+
+        const postId = getPostId();
+        if (!postId) {
+          alert('post_id가 템플릿으로 전달되지 않았습니다.');
+          return;
+        }
+
+        try {
+          const res  = await fetch(`/reviewer/submit_result/${postId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ selected_ids: checked })
+          });
+          const data = await res.json();
+          if (!data.ok) throw new Error(data.msg || '제출 실패');
+          alert('제출 완료! 크리에이터에게 전달되었습니다.');
+        } catch (e) {
+          alert(e.message);
+        }
+      });
+    }
+
+    // 최대 3개 제한
+    document.querySelectorAll('input[name="clip_ids"]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const checked = document.querySelectorAll('input[name="clip_ids"]:checked');
+        if (checked.length > 3) {
+          cb.checked = false;
+          alert('최대 3개까지만 선택 가능합니다.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
