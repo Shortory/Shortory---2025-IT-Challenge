@@ -224,9 +224,9 @@ shortoty_web/
   <thead>
     <tr align="center">
       <th>FULLSTACK</th>
+      <th>AI & BACKEND</th>
       <th>BACKEND</th>
-      <th>AI</th>
-      <th>AI & DESIGN</th>
+      <th>AI & FRONTEND</th>
     </tr>
   </thead>
   <tbody>
