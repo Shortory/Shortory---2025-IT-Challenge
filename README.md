@@ -1,4 +1,4 @@
-<h2 align="center">⚡️ Reaction-to-Shorts : 시청자의 반응으로 생성하는 하이라이트 숏츠 </h2>
+<h2 align="center">⚡️ Reaction-to-Shorts : 시청자의 반응으로 생성하는 하이라이트 쇼츠 자동화 서비스 </h2>
 
 <br/>
 
