@@ -18,21 +18,24 @@
  
 
 <br/>
+<br/>
 
 ## 프로젝트 개요
+<br/>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/72bcdc35-3dca-419b-812f-522ff8620ef9" alt="아키텍처" width="70%">
+</p>
+
+
 **숏토리(Shortory)** 는 서로 독립적으로 동작하는 두 가지 방식으로 숏폼 하이라이트 영상을 자동 생성하는 웹 서비스입니다.
 - 반응 기반 모드: 웹캠으로 수집한 시청자의 표정·시선 데이터를 분석해 집중도/감정 반응이 두드러진 구간을 자동 선정하여 클립을 생성합니다.
 - 댓글 타임스탬프 기반 모드: 유튜브 댓글에 포함된 타임스탬프를 수집·집계해 언급 빈도가 높은 구간을 하이라이트로 추출합니다.
 
 <br />
 
-## ⚡️ 핵심 아이디어
+## Creator & Reviewer Flow
 
-> 댓글과 표정, 모두가 말해주는 진짜 하이라이트!
-> 
-- `타임스탬프` 가 포함된 댓글 자동 수집&분석
-- 웹캠 기반 **표정 분석으로 감정 + 집중도** 추적
-- **몰입도 높은 순간**만 골라 감정 기반 하이라이트 완성!
+<img width="1526" height="640" alt="image" src="https://github.com/user-attachments/assets/ca6d53b1-e3e5-48f4-9e5b-bd8fc5b68d43" />
 
 <br />
 
@@ -55,7 +58,7 @@
 
 <br />
 
-## ⚙️ Architecture 구조도
+### ⚙️ Architecture 구조도
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/9354f1c0-da93-4daf-b28c-4f297fa61d68" alt="아키텍처" width="70%">
@@ -64,7 +67,7 @@
 
 <br />
 
-## 타임스탬프(timestamp) 정의
+### 타임스탬프(timestamp) 정의
 
 **타임스탬프**는 영상 속 특정 시점을 나타내는 시간 정보로, 일반적으로 `"00:45"`, `"3:15"`, `"12:34"`와 같은 **`분:초` 또는 `시:분:초` 형식**으로 표현됩니다.
 
@@ -110,111 +113,8 @@ emotion_tl2_model.h5 모델을 다운받아 실행 가능합니다.
 <br />
 
 
-## 결과 화면
-<h4 align="center">[메인 화면]</strong></h4>
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/ecc7faff-036a-49ef-ae78-73f645144bff" width="700"/>
-</p>
-
-<br>
-<h4 align="center">[감정 분석 기반 숏폼 생성]</strong></h4>
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/c1d13bfb-fb07-4805-a288-fe94f46e25ae" width="700"/>
-</p>
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/cd7020b7-423a-4f74-96ee-617b13228042" width="700"/>
-</p>
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/e3357126-5745-46cc-949c-35716c54babf" width="700"/>
-</p>
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/1d266558-a883-4040-b43c-c1818b0b33c2" width="700"/>
-
-<br>
-<h4 align="center">[타임스탬프 기반 숏폼 생성]</strong></h4>
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/8a930645-317e-440b-983e-13675fbcb409" width="700" />
-  
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/612ce1b7-e56e-4361-b134-efd1e6195990" width="700" />
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/3b49a1d3-f3ec-43e4-9740-119852824c05" width="700" />
-
-</p>
-
-## 실행 방법
-**1. 가상환경 및 패키지 설치**
-<br>
-pip install -r requirements.txt
-
-**2. 감정 인식 모델 다운로드**
-<br>
-🔗 https://drive.google.com/file/d/18ryNf-Tt2eEFnr6hsnPOJA6nmwyaEuwA/view?usp=share_link
-
-다운로드 후 프로젝트 내의 models 폴더에 저장
-
-**3. Flask 서버 실행**
-<br>
-python app.py
 
 
-
-<br />   
-
-## 프로젝트 폴더 구조
-
-```
-shortoty_web/
-│
-├── backend/                          # 백엔드 로직 처리 (Flask 서버 및 분석 스크립트)
-│   ├── app.py                        # 메인 Flask 서버 및 라우팅
-│   ├── run_analysis.py               # 실시간 감정 분석 처리 로직
-│   └── create_shorts.py              # 댓글 기반 타임스탬프 분석 및 숏폼 생성
-│
-├── models/                           # 감정 분석을 위한 학습 모델
-│   └── emotion_tl2_model.h5          # 감정 분류 모델 (Keras 기반)
-│
-├── timestamp_uploads/                # 댓글 기반 분석을 위한 원본 영상 저장 폴더
-│
-├── emotion_uploads/                  # 감정 분석용 원본 영상 저장 폴더
-│
-├── static/                           # 정적 파일 및 분석 결과 저장소
-│   ├── shorts_output/                # 감정 분석 기반 숏폼 영상 결과
-│   │   └── categories/               # 감정별 클립 분류 (Angry, Happy, etc.)
-│   └── timestamp_output/             # 댓글 기반 숏폼 결과 저장
-│
-├── frontend/                         # 프론트엔드 화면 구성 (Flask HTML 템플릿)
-│   └── templates/
-│       ├── home.html                # 메인 진입 페이지
-│       ├── emotion_form.html        # 감정 분석용 URL 입력 폼
-│       ├── timestamp_form.html      # 댓글 기반 분석 URL 입력 폼
-│       ├── loading.html             # 댓글 분석 대기 화면
-│       ├── analyzing.html           # 감정 분석 진행 중 화면
-│       ├── result.html              # 감정 분석 결과 페이지
-│       ├── categories.html          # 감정별 클립 보관함
-│       └── shorts_comment_result.html # 댓글 기반 숏폼 결과 및 다운로드
-│
-├── requirements.txt                  # 의존성 라이브러리 목록
-└── README.md                         # 프로젝트 개요 및 설명 문서
-
-```
-
-## 깃허브 폴더 설명
-
-- **backend/** : Flask 서버와 분석 스크립트 (app.py, run_analysis.py, create_shorts.py)
-- **models/** : 감정 분석 모델 파일
-- **frontend/** : 사용자 인터페이스 HTML 템플릿
-- **static/** : 생성된 숏폼 영상 및 감정별 클립 저장 폴더
-- **emotion_uploads/** : 감정 분석용 업로드 원본 영상 저장
-- **timestamp_uploads/** : 댓글 기반 분석용 업로드 원본 영상 저장
-
-<br />
 
 <p align="center"><strong>
   
