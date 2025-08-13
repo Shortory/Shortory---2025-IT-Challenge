@@ -61,7 +61,7 @@
 ### ⚙️ Architecture 구조도
 
 <p align="center">
-  <img src="<img width="1336" height="799" alt="image" src="https://github.com/user-attachments/assets/6fc4df2e-ee90-42b1-ab25-82515a238610" />">
+  <img width="1336" height="799" alt="image" src="https://github.com/user-attachments/assets/cfaa66c9-9f20-4585-8efe-f8b755add52d" />
 </p>
 
 
